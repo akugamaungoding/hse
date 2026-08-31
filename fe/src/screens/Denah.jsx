@@ -18,7 +18,8 @@ import {
   Shield,
   Compass,
 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useLocation } from "react-router";
 import { DENAH_PDF_LIST } from "../constants/denahList";
 
 const FLOOR_MAPPING = {
@@ -65,9 +66,12 @@ const mapFloorToAreaId = (floorName) => {
   return "GF";
 };
 
+const CIVITAS_ROOM_ID = "denah/Kampus/Lantai 2/Ruangan Kelas CB201.pdf";
+
 export function Denah() {
-  const [selectedArea, setSelectedArea] = useState("GF");
-  const [selectedRoomId, setSelectedRoomId] = useState("");
+  const location = useLocation();
+  const [selectedArea, setSelectedArea] = useState("2");
+  const [selectedRoomId, setSelectedRoomId] = useState(CIVITAS_ROOM_ID);
   const [searchQuery, setSearchQuery] = useState("");
   const [showListModal, setShowListModal] = useState(false);
   const [showMandatoriModal, setShowMandatoriModal] = useState(false);
@@ -84,16 +88,88 @@ export function Denah() {
     "TK-03": "",
   });
 
+  // Helper to extract key search tokens from room / location strings
+  const getTokens = (str) => {
+    return str
+      .toLowerCase()
+      .replace(/\b(ruangan|ruang|lab|laboratorium|gedung|lantai|lt|\d+|pos|pintu|depan|samping|komunal)\b/g, "")
+      .replace(/[^a-z0-9]/g, " ")
+      .trim()
+      .split(/\s+/)
+      .filter((t) => t.length > 2);
+  };
+
+  // Auto-select floor & room from passed location state (e.g. from APAR list / detail)
+  useEffect(() => {
+    const targetLokasi = location.state?.lokasi;
+    if (targetLokasi) {
+      const locLower = targetLokasi.toLowerCase();
+      let targetAreaKey = "2";
+      if (locLower.includes("lantai 1") || locLower.includes("lt 1") || locLower.includes("lantai-1") || locLower.includes("lt. 1")) {
+        targetAreaKey = "1";
+      } else if (locLower.includes("lantai 2") || locLower.includes("lt 2") || locLower.includes("lantai-2") || locLower.includes("lt. 2")) {
+        targetAreaKey = "2";
+      } else if (locLower.includes("lantai 3") || locLower.includes("lt 3") || locLower.includes("lantai-3") || locLower.includes("lt. 3")) {
+        targetAreaKey = "3";
+      } else if (locLower.includes("gf")) {
+        targetAreaKey = "GF";
+      } else if (locLower.includes("parkir")) {
+        targetAreaKey = "Parkiran";
+      } else if (locLower.includes("dorm")) {
+        targetAreaKey = "Dormitori";
+      }
+
+      setSelectedArea(targetAreaKey);
+      const targetFloorName = FLOOR_MAPPING[targetAreaKey] || "Lantai 2";
+
+      const floorPdfs = DENAH_PDF_LIST.filter((pdf) => pdf.floor === targetFloorName);
+      if (floorPdfs.length > 0) {
+        // First try direct substring match
+        let bestMatch = floorPdfs.find(
+          (pdf) =>
+            locLower.includes(pdf.roomName.toLowerCase()) ||
+            pdf.roomName.toLowerCase().includes(locLower)
+        );
+
+        // If no direct substring match, use key token overlap score (e.g. "Lab Otomasi Industri" -> "Ruangan Otomasi Industri")
+        if (!bestMatch) {
+          const targetTokens = getTokens(targetLokasi);
+          let maxScore = 0;
+
+          for (const pdf of floorPdfs) {
+            const pdfTokens = getTokens(pdf.roomName);
+            let score = 0;
+            for (const tt of targetTokens) {
+              if (pdfTokens.some((pt) => pt.includes(tt) || tt.includes(pt))) {
+                score += 1;
+              }
+            }
+            if (score > maxScore) {
+              maxScore = score;
+              bestMatch = pdf;
+            }
+          }
+        }
+
+        if (bestMatch) {
+          setSelectedRoomId(bestMatch.id);
+        } else {
+          setSelectedRoomId(floorPdfs[0].id);
+        }
+      }
+    }
+  }, [location.state]);
+
   const areas = [
     { id: "GF", label: "Gedung GF" },
     { id: "1", label: "Lantai 1" },
-    { id: "2", label: "Lantai 2" },
+    { id: "2", label: "Lantai 2 (Ruanganku)" },
     { id: "3", label: "Lantai 3" },
     { id: "Parkiran", label: "Parkiran" },
     { id: "Dormitori", label: "Dormitory" },
   ];
 
-  const currentFloorName = FLOOR_MAPPING[selectedArea] || "Lantai GF";
+  const currentFloorName = FLOOR_MAPPING[selectedArea] || "Lantai 2";
 
   // PDFs filtered by selected floor
   const currentFloorPdfs = useMemo(() => {
@@ -106,7 +182,7 @@ export function Denah() {
       const found = DENAH_PDF_LIST.find((p) => p.id === selectedRoomId);
       if (found) return found;
     }
-    return currentFloorPdfs[0] || null;
+    return currentFloorPdfs.find((p) => p.id === CIVITAS_ROOM_ID) || currentFloorPdfs[0] || null;
   }, [selectedRoomId, currentFloorPdfs]);
 
   // Global search or category filter list for search modal
@@ -213,11 +289,14 @@ export function Denah() {
                     onChange={(e) => setSelectedRoomId(e.target.value)}
                     className="flex-1 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold py-2 px-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 truncate"
                   >
-                    {currentFloorPdfs.map((pdf) => (
-                      <option key={pdf.id} value={pdf.id}>
-                        {pdf.roomName} ({pdf.category})
-                      </option>
-                    ))}
+                    {currentFloorPdfs.map((pdf) => {
+                      const isCivitasRoom = pdf.id === CIVITAS_ROOM_ID;
+                      return (
+                        <option key={pdf.id} value={pdf.id}>
+                          {isCivitasRoom ? `📍 ${pdf.roomName} (Ruangan Saya)` : `${pdf.roomName} (${pdf.category})`}
+                        </option>
+                      );
+                    })}
                   </select>
 
                   {selectedPdf && (
@@ -255,7 +334,7 @@ export function Denah() {
                 <Compass className="w-3.5 h-3.5 text-blue-600" /> Mandatori Area Tujuan Evakuasi
               </span>
               <p className="text-[11px] text-gray-600">
-                Gedung & lantai dialokasikan secara mandatori ke Titik Kumpul tertentu untuk akurasi perhitungan jumlah MP ter-evakuasi.
+                Gedung &amp; lantai dialokasikan secara mandatori ke Titik Kumpul tertentu untuk akurasi perhitungan jumlah MP ter-evakuasi.
               </p>
             </div>
           )}
@@ -266,8 +345,8 @@ export function Denah() {
           <div className="flex-1 bg-slate-900 relative overflow-hidden flex flex-col p-2">
             {selectedPdf ? (
               <div className="w-full h-full flex flex-col rounded-xl overflow-hidden shadow-lg border border-slate-800 bg-white relative">
-                {/* Active PDF Subheader */}
-                <div className="bg-slate-800 text-white px-3 py-2 flex items-center justify-between text-xs border-b border-slate-700 shrink-0">
+                {/* Active PDF Subheader with Conditional Location Tag Marker */}
+                <div className="bg-slate-800 text-white px-3 py-2 flex items-center justify-between text-xs border-b border-slate-700 shrink-0 gap-2">
                   <div className="flex items-center gap-2 truncate">
                     <FileText className="w-4 h-4 text-red-400 shrink-0" />
                     <span className="font-bold truncate">{selectedPdf.roomName}</span>
@@ -276,10 +355,27 @@ export function Denah() {
                     </span>
                   </div>
 
+                  {/* Location Tag Marker Icon Badge */}
+                  {location.state?.assetId ? (
+                    <div className="flex items-center gap-1 bg-[#0b5cff] text-white px-2.5 py-1 rounded-full text-[10px] font-extrabold shrink-0 border border-blue-400/40 shadow-xs animate-pulse">
+                      <MapPin className="w-3.5 h-3.5 text-yellow-300 fill-yellow-300" />
+                      <span>📍 LOKASI {location.state.assetId} AKTIF</span>
+                    </div>
+                  ) : selectedPdf.id === CIVITAS_ROOM_ID ? (
+                    <div className="flex items-center gap-1 bg-green-600 text-white px-2.5 py-1 rounded-full text-[10px] font-extrabold shrink-0 border border-green-400/40 shadow-xs animate-pulse">
+                      <MapPin className="w-3.5 h-3.5 text-yellow-300 fill-yellow-300" />
+                      <span>📍 LOKASI RUANGANKU AKTIF</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1 bg-slate-700 text-slate-300 px-2.5 py-1 rounded-full text-[10px] font-semibold shrink-0">
+                      <span>Ruangan Lain</span>
+                    </div>
+                  )}
+
                   <a
                     href={selectedPdf.path}
                     download={selectedPdf.fileName}
-                    className="text-[11px] text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-1 shrink-0 ml-2"
+                    className="text-[11px] text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-1 shrink-0 ml-1"
                   >
                     <Download size={13} /> PDF
                   </a>

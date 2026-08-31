@@ -50,8 +50,8 @@ export function Utama() {
   const [recentInspeksi, setRecentInspeksi] = useState([]);
   const scrollContainerRef = useRef(null);
 
-  // Civitas location state
-  const [userLocation, setUserLocation] = useState("Gedung A - Lantai 2");
+  // Civitas location state (Ruangan Kelas CB201 di Lantai 2)
+  const [userLocation, setUserLocation] = useState("Ruangan Kelas CB201 (Lantai 2)");
 
   // Active K3 Simulation Announcement State
   const [simulasiAnnouncement, setSimulasiAnnouncement] = useState(null);

@@ -119,8 +119,9 @@ export function AparList() {
                     <span className="text-[10px] text-gray-400">Terakhir: {apar.lastInspeksi}</span>
                     <Link
                       to="/denah"
+                      state={{ assetId: apar.id, lokasi: apar.lokasi }}
                       className="text-[10px] bg-blue-50 text-blue-700 hover:bg-blue-100 font-bold px-2 py-1 rounded-lg flex items-center gap-1 transition-colors"
-                      title="Lihat Lokasi APAR Terdekat di Denah"
+                      title={`Lihat Lokasi ${apar.id} (${apar.lokasi}) di Denah`}
                     >
                       Denah 📍
                     </Link>

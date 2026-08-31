@@ -164,12 +164,22 @@ export function AparDetail() {
           )}
 
           <div className="flex flex-col gap-3">
-            <div className="flex items-start gap-3">
-              <MapPin className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
-              <div>
-                <p className="text-[10px] text-gray-400">Lokasi</p>
-                <p className="text-sm font-semibold text-gray-800">{apar.lokasi}</p>
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <MapPin className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
+                <div>
+                  <p className="text-[10px] text-gray-400">Lokasi</p>
+                  <p className="text-sm font-semibold text-gray-800">{apar.lokasi}</p>
+                </div>
               </div>
+              <Link
+                to="/denah"
+                state={{ assetId: apar.id, lokasi: apar.lokasi }}
+                className="text-xs bg-blue-50 text-blue-700 hover:bg-blue-100 font-bold px-3 py-1 rounded-lg flex items-center gap-1 transition-colors shrink-0 shadow-2xs"
+                title={`Lihat Lokasi ${apar.id} di Denah`}
+              >
+                Lihat di Denah 📍
+              </Link>
             </div>
             <div className="flex items-start gap-3">
               {iconTipe}

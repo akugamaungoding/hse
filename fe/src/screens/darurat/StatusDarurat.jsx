@@ -29,7 +29,18 @@ const STATUS_DESC = {
 
 function fmtTime(iso) {
   if (!iso) return null;
-  return new Date(iso).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) + " WIB";
+  const d = new Date(iso);
+  const dateStr = d.toLocaleDateString("id-ID", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+  const timeStr = d.toLocaleTimeString("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit",
+  }) + " WIB";
+  return `${dateStr} · ${timeStr}`;
 }
 
 export function StatusDarurat() {
