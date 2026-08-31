@@ -1,0 +1,688 @@
+[
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.AsetController",
+    "Method": "GetAll",
+    "RelativePath": "api/Aset",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "tipe",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "status",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.AsetController",
+    "Method": "Create",
+    "RelativePath": "api/Aset",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "TanggapDaruratApi.DTOs.Aset.CreateAsetDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.AsetController",
+    "Method": "GetById",
+    "RelativePath": "api/Aset/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.AsetController",
+    "Method": "Update",
+    "RelativePath": "api/Aset/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "TanggapDaruratApi.DTOs.Aset.UpdateAsetDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.AsetController",
+    "Method": "Delete",
+    "RelativePath": "api/Aset/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.AsetController",
+    "Method": "SubmitInspeksi",
+    "RelativePath": "api/Aset/{id}/inspeksi",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "TanggapDaruratApi.DTOs.Aset.InspeksiRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.AsetController",
+    "Method": "GetHistory",
+    "RelativePath": "api/Aset/{id}/riwayat",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.AsetController",
+    "Method": "GetRecentInspeksi",
+    "RelativePath": "api/Aset/recent-inspeksi",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "limit",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.AssemblyPointController",
+    "Method": "KonfirmasiLengkap",
+    "RelativePath": "api/AssemblyPoint/kejadian/{kejadianId}/konfirmasi-lengkap",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "kejadianId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.AssemblyPointController",
+    "Method": "GetList",
+    "RelativePath": "api/AssemblyPoint/kejadian/{kejadianId}/list",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "kejadianId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.AssemblyPointController",
+    "Method": "GetRekap",
+    "RelativePath": "api/AssemblyPoint/kejadian/{kejadianId}/rekap",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "kejadianId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.AssemblyPointController",
+    "Method": "Scan",
+    "RelativePath": "api/AssemblyPoint/scan",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "TanggapDaruratApi.DTOs.AssemblyPoint.Request.ScanAssemblyRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.AuthController",
+    "Method": "Login",
+    "RelativePath": "api/Auth/login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "TanggapDaruratApi.DTOs.Auth.Request.LoginRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.AuthController",
+    "Method": "Me",
+    "RelativePath": "api/Auth/me",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.AuthController",
+    "Method": "GetUsersByRole",
+    "RelativePath": "api/Auth/users-by-role/{roleCode}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "roleCode",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.EvakuasiController",
+    "Method": "Instruksi",
+    "RelativePath": "api/Evakuasi/{id}/instruksi",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.EvakuasiController",
+    "Method": "Selesai",
+    "RelativePath": "api/Evakuasi/{id}/selesai",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "TanggapDaruratApi.DTOs.Evakuasi.Request.SelesaiEvakuasiRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.EvakuasiController",
+    "Method": "GetByKejadian",
+    "RelativePath": "api/Evakuasi/kejadian/{kejadianId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "kejadianId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.KejadianController",
+    "Method": "GetAll",
+    "RelativePath": "api/Kejadian",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Status",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Urut",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "PageNumber",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "PageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.KejadianController",
+    "Method": "PengumumanAman",
+    "RelativePath": "api/Kejadian/{id}/pengumuman-aman",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.KejadianController",
+    "Method": "PengumumanDarurat",
+    "RelativePath": "api/Kejadian/{id}/pengumuman-darurat",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.KejadianController",
+    "Method": "GetStatus",
+    "RelativePath": "api/Kejadian/{id}/status",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.KejadianController",
+    "Method": "Validasi",
+    "RelativePath": "api/Kejadian/{id}/validasi",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "TanggapDaruratApi.DTOs.Kejadian.Request.ValidasiKejadianRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.KejadianController",
+    "Method": "GetAktif",
+    "RelativePath": "api/Kejadian/aktif",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.KejadianController",
+    "Method": "Alert",
+    "RelativePath": "api/Kejadian/alert",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "TanggapDaruratApi.DTOs.Kejadian.Request.CreateKejadianRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.KoordinasiController",
+    "Method": "GetHistory",
+    "RelativePath": "api/Koordinasi/kejadian/{kejadianId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "kejadianId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.KoordinasiController",
+    "Method": "TetapkanAman",
+    "RelativePath": "api/Koordinasi/kejadian/{kejadianId}/tetapkan-aman",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "kejadianId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.KoordinasiController",
+    "Method": "Update",
+    "RelativePath": "api/Koordinasi/kejadian/{kejadianId}/update",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "kejadianId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "TanggapDaruratApi.DTOs.Koordinasi.Request.UpdateKoordinasiRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.LaporanController",
+    "Method": "GetAll",
+    "RelativePath": "api/Laporan",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "pageNumber",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.LaporanController",
+    "Method": "Get",
+    "RelativePath": "api/Laporan/kejadian/{kejadianId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "kejadianId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.LaporanController",
+    "Method": "Create",
+    "RelativePath": "api/Laporan/kejadian/{kejadianId}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "kejadianId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "TanggapDaruratApi.DTOs.Laporan.Request.CreateLaporanRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.NotifikasiController",
+    "Method": "GetAll",
+    "RelativePath": "api/Notifikasi",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "pageNumber",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.NotifikasiController",
+    "Method": "MarkAsRead",
+    "RelativePath": "api/Notifikasi/{id}/read",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.NotifikasiController",
+    "Method": "UnreadCount",
+    "RelativePath": "api/Notifikasi/unread-count",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.P3KController",
+    "Method": "Get",
+    "RelativePath": "api/P3K/kejadian/{kejadianId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "kejadianId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.P3KController",
+    "Method": "Upsert",
+    "RelativePath": "api/P3K/kejadian/{kejadianId}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "kejadianId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "TanggapDaruratApi.DTOs.P3K.Request.UpsertP3KRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.PemadamanController",
+    "Method": "Get",
+    "RelativePath": "api/Pemadaman/kejadian/{kejadianId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "kejadianId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.PemadamanController",
+    "Method": "Upsert",
+    "RelativePath": "api/Pemadaman/kejadian/{kejadianId}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "kejadianId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "TanggapDaruratApi.DTOs.Pemadaman.Request.UpsertPemadamanRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.SimulasiController",
+    "Method": "GetAll",
+    "RelativePath": "api/Simulasi",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TanggapDaruratApi.Controllers.SimulasiController",
+    "Method": "Create",
+    "RelativePath": "api/Simulasi",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "TanggapDaruratApi.DTOs.Simulasi.SimulasiRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

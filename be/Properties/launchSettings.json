@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "TanggapDaruratApi": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:52694;http://localhost:52695"
+    }
+  }
+}
