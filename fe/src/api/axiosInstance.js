@@ -22,6 +22,9 @@ axiosInstance.interceptors.request.use(
       );
       config.params = cleanParams;
     }
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     const authState = useAuthStore.getState();
     if (authState.userId) {
       config.headers["X-User-Id"] = authState.userId.toString();
