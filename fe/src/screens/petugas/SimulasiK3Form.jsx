@@ -55,7 +55,7 @@ export function SimulasiK3Form() {
     // Save to notifications list for all users
     const notifItem = {
       id: "notif-sim-" + Date.now(),
-      title: `📢 SIMULASI EMERGENCY: ${namaSimulasi}`,
+      title: `SIMULASI EMERGENCY: ${namaSimulasi}`,
       desc: pesan,
       time: "Baru saja",
       tipe: "Simulasi",

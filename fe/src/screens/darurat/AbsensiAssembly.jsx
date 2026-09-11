@@ -82,7 +82,7 @@ export function AbsensiAssembly() {
               <MapPin className="w-3 h-3 text-[#0140c7]" /> Titik Kumpul (3 Assembly Point)
             </span>
             <span className="text-[10px] bg-blue-100 text-[#0140c7] font-extrabold px-2 py-0.5 rounded-full flex items-center gap-1">
-              🔒 Mandatori Setting Active
+              Mandatori Setting Active
             </span>
           </div>
           <select

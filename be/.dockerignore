@@ -1,0 +1,15 @@
+# Ignore Git & CI Config
+.git
+.gitignore
+.gitlab-ci.yml
+docker-compose*.yml
+Dockerfile*
+.env
+
+# Ignore Build & Output Folders
+bin/
+obj/
+
+# Ignore Local Sensitive Settings (Agar tidak bocor ke image)
+appsettings.Production.json
+appsettings.Development.json

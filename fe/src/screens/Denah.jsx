@@ -293,7 +293,7 @@ export function Denah() {
                       const isCivitasRoom = pdf.id === CIVITAS_ROOM_ID;
                       return (
                         <option key={pdf.id} value={pdf.id}>
-                          {isCivitasRoom ? `📍 ${pdf.roomName} (Ruangan Saya)` : `${pdf.roomName} (${pdf.category})`}
+                          {isCivitasRoom ? `${pdf.roomName} (Ruangan Saya)` : `${pdf.roomName} (${pdf.category})`}
                         </option>
                       );
                     })}
@@ -359,12 +359,12 @@ export function Denah() {
                   {location.state?.assetId ? (
                     <div className="flex items-center gap-1 bg-[#0b5cff] text-white px-2.5 py-1 rounded-full text-[10px] font-extrabold shrink-0 border border-blue-400/40 shadow-xs animate-pulse">
                       <MapPin className="w-3.5 h-3.5 text-yellow-300 fill-yellow-300" />
-                      <span>📍 LOKASI {location.state.assetId} AKTIF</span>
+                      <span>LOKASI {location.state.assetId} AKTIF</span>
                     </div>
                   ) : selectedPdf.id === CIVITAS_ROOM_ID ? (
                     <div className="flex items-center gap-1 bg-green-600 text-white px-2.5 py-1 rounded-full text-[10px] font-extrabold shrink-0 border border-green-400/40 shadow-xs animate-pulse">
                       <MapPin className="w-3.5 h-3.5 text-yellow-300 fill-yellow-300" />
-                      <span>📍 LOKASI RUANGANKU AKTIF</span>
+                      <span>LOKASI RUANGANKU AKTIF</span>
                     </div>
                   ) : (
                     <div className="flex items-center gap-1 bg-slate-700 text-slate-300 px-2.5 py-1 rounded-full text-[10px] font-semibold shrink-0">

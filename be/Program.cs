@@ -21,16 +21,40 @@ namespace TanggapDaruratApi
             Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.WebHost.ConfigureKestrel(options =>
+            {
+                options.Limits.MaxRequestBodySize = 104857600;
+            });
+            builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
+            {
+                options.MultipartBodyLengthLimit = 104857600;
+            });
+
             var configuration = builder.Configuration;
 
-            var corsOrigin = configuration.GetSection("Key:corsAllowFrom").Get<string[]>();
-            if (corsOrigin == null || corsOrigin.Length == 0)
-                throw new InvalidOperationException("Konfigurasi CORS 'Key:corsAllowFrom' tidak ditemukan atau kosong.");
+            var corsOrigin = configuration.GetSection("Key:corsAllowFrom").Get<string[]>() ?? new[] { "*" };
 
+            var rawConn = configuration.GetConnectionString("DefaultConnection");
+            var decryptKeyConn = Environment.GetEnvironmentVariable("DECRYPT_KEY_CONNECTION_STRING");
+            string conn;
 
-            var conn = configuration.GetConnectionString("DefaultConnection");
-            if (string.IsNullOrEmpty(conn))
-                throw new InvalidOperationException("Konfigurasi ConnectionString tidak ditemukan atau kosong.");
+            if (!string.IsNullOrEmpty(decryptKeyConn) && !string.IsNullOrEmpty(rawConn))
+            {
+                conn = PolmanAstraLibrary.PolmanAstraLibrary.Decrypt(rawConn, decryptKeyConn);
+            }
+            else
+            {
+                conn = rawConn ?? throw new InvalidOperationException("Konfigurasi ConnectionString tidak ditemukan atau kosong.");
+            }
+
+            var envJwtKey = Environment.GetEnvironmentVariable("DECRYPT_KEY_JWT");
+            var jwtKey = !string.IsNullOrEmpty(envJwtKey)
+                ? envJwtKey
+                : (configuration["Key:jwtKey"] ?? "CHANGE_ME_ToALongRandomSecretKeyBeforeDeploying123!@#");
+
+            var issuer = configuration.GetSection("Key:jwtIssuer").Get<string[]>() ?? new[] { "http://localhost:5234" };
+            var audience = configuration["Key:jwtAudience"] ?? "http://localhost:3000";
 
             builder.Services.AddSingleton(new DatabaseConfig { ConnectionString = conn });
 
@@ -110,6 +134,27 @@ namespace TanggapDaruratApi
                 });
             });
 
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuers = issuer,
+                    ValidAudience = audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+                };
+            });
+
 
 
             builder.Services.Configure<ApiBehaviorOptions>(options =>
@@ -141,7 +186,7 @@ namespace TanggapDaruratApi
 
             var app = builder.Build();
 
-            if (app.Environment.IsDevelopment())
+            if (app.Environment.IsDevelopment() || builder.Configuration.GetValue<bool>("EnableSwagger", true))
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
@@ -152,6 +197,7 @@ namespace TanggapDaruratApi
             }
 
             app.UseCors("AllowSpecificOrigin");
+            app.UseAuthentication();
 
             app.Use(async (context, next) =>
             {

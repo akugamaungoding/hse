@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { PetugasLayout } from "../../components/PetugasLayout";
-import { Flame, Truck, CheckCircle2, AlertTriangle, ShieldCheck, MessageSquare, Droplets } from "lucide-react";
+import { Flame, Truck, CheckCircle2, AlertTriangle, ShieldCheck, MessageSquare, Droplets, Activity, Gauge, Clock } from "lucide-react";
 import { useActiveKejadian } from "@/hooks/useActiveKejadian";
 import { pemadamanServices } from "@/services/pemadamanServices";
+import { useApp } from "@/context/AppContext";
+import { useAuthStore } from "@/store/useAuthStore";
 
 function fmtJam(iso) {
   if (!iso) return "-";
@@ -12,6 +14,9 @@ function fmtJam(iso) {
 export function PemadamanForm() {
   const { kejadian } = useActiveKejadian();
   const kejadianId = kejadian?.kejadianId;
+  const { pompas } = useApp();
+  const { roleCode } = useAuthStore();
+  const isPompaRole = roleCode === "PIC_RUANG_POMPA" || roleCode === "SUPER_ADMIN";
 
   const [loadingAwal, setLoadingAwal] = useState(true);
 
@@ -115,7 +120,10 @@ export function PemadamanForm() {
   };
 
   return (
-    <PetugasLayout title="Pemadaman Fire Fighter" subtitle="Tim Fire Fighter & Koordinasi Hydrant (K3)">
+    <PetugasLayout
+      title={isPompaRole && roleCode === "PIC_RUANG_POMPA" ? "Pemadaman & Status Pompa" : "Pemadaman Fire Fighter"}
+      subtitle={isPompaRole && roleCode === "PIC_RUANG_POMPA" ? "PIC Ruang Pompa – Pantau pompa & update laporan" : "Tim Fire Fighter & Koordinasi Hydrant (K3)"}
+    >
       {!kejadian && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 flex flex-col items-center text-center gap-3">
           <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
@@ -142,6 +150,64 @@ export function PemadamanForm() {
               <p className="text-xs text-gray-500 mt-0.5">{kejadian.lokasi}</p>
             </div>
           </div>
+
+          {/* Panel Info Status Pompa – PIC Ruang Pompa & Super Admin */}
+          {isPompaRole && pompas.length > 0 && (
+            <div className="bg-white rounded-2xl shadow-sm border border-blue-100 p-4 flex flex-col gap-3">
+              <div className="flex items-center gap-2 border-b border-gray-100 pb-2">
+                <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+                  <Droplets className="w-4 h-4 text-blue-600" />
+                </div>
+                <div>
+                  <h4 className="font-['Poppins',sans-serif] font-bold text-sm text-gray-800">Status Pompa Hydrant</h4>
+                  <p className="text-[10px] text-gray-400">{pompas.filter(p => p.status === "Aman").length} / {pompas.length} unit dalam kondisi Aman</p>
+                </div>
+                <span className={`ml-auto text-[10px] font-bold px-2.5 py-1 rounded-full ${
+                  pompas.every(p => p.status === "Aman")
+                    ? "bg-green-100 text-green-700"
+                    : "bg-red-100 text-red-700"
+                }`}>
+                  {pompas.every(p => p.status === "Aman") ? "Semua Aman" : "Ada Masalah"}
+                </span>
+              </div>
+              <div className="flex flex-col gap-2">
+                {pompas.map((pom) => (
+                  <div key={pom.id} className={`flex items-start gap-3 p-3 rounded-xl border ${
+                    pom.status === "Aman"
+                      ? "bg-green-50 border-green-100"
+                      : "bg-red-50 border-red-100"
+                  }`}>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                      pom.status === "Aman" ? "bg-green-100" : "bg-red-100"
+                    }`}>
+                      {pom.status === "Aman"
+                        ? <CheckCircle2 className="w-4 h-4 text-green-600" />
+                        : <AlertTriangle className="w-4 h-4 text-red-600" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-1">
+                        <p className="font-['Poppins',sans-serif] font-bold text-xs text-gray-800">{pom.id}</p>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
+                          pom.status === "Aman" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                        }`}>{pom.status}</span>
+                      </div>
+                      <p className="text-[11px] text-gray-500 truncate">{pom.lokasi}</p>
+                      {pom.detail && (
+                        <p className="text-[10px] text-gray-400 mt-0.5 flex items-center gap-1">
+                          <Activity className="w-3 h-3 shrink-0" />{pom.detail}
+                        </p>
+                      )}
+                      {pom.lastInspeksi && (
+                        <p className="text-[10px] text-gray-400 flex items-center gap-1 mt-0.5">
+                          <Clock className="w-3 h-3 shrink-0" />Terakhir inspeksi: {pom.lastInspeksi}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {loadingAwal && (
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 flex flex-col items-center justify-center gap-3">

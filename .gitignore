@@ -1,0 +1,38 @@
+## Build results & outputs
+[Bb]in/
+[Oo]bj/
+publish_test/
+dist/
+build/
+
+## Visual Studio & IDE files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.idea/
+.vscode/
+
+## Node.js & Vite
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.vite/
+
+## Environment & Secrets
+.env
+.env.*
+!.env.example
+appsettings.Production.json
+appsettings.Development.json
+
+## SonarQube & CI
+.sonar/
+.nuget/
+
+## OS generated files
+.DS_Store
+Thumbs.db

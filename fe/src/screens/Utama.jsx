@@ -177,6 +177,10 @@ export function Utama() {
         return [
           { label: "Form Laporan Pemadaman Fire Fighter", to: "/petugas/pemadaman", icon: <Flame className="w-5 h-5 text-red-600" /> },
         ];
+      case "PIC_RUANG_POMPA":
+        return [
+          { label: "Laporan Pemadaman & Status Pompa", to: "/petugas/pemadaman", icon: <Droplets className="w-5 h-5 text-blue-600" /> },
+        ];
       case "KEPALA_TKTD":
         return [
           { label: "Dashboard Koordinasi Utama TKTD", to: "/petugas/koordinasi", icon: <SlidersHorizontal className="w-5 h-5 text-[#0140c7]" /> },
@@ -557,7 +561,7 @@ export function Utama() {
                             </span>
                             {notOkCount > 0 && (
                               <span className="text-[10px] font-extrabold bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full border border-amber-300 flex items-center gap-0.5 group-hover:bg-amber-200 transition-colors">
-                                ⚠️ {notOkCount} Belum OK <ChevronRight className="w-3 h-3 text-amber-700" />
+                                {notOkCount} Belum OK <ChevronRight className="w-3 h-3 text-amber-700" />
                               </span>
                             )}
                           </div>
@@ -669,7 +673,8 @@ export function Utama() {
                     { label: "Evakuasi Lantai (Floor Warden)", to: "/petugas/evakuasi" },
                     { label: "Assembly Point (PIC Assembly Point)", to: "/petugas/assembly-point" },
                     { label: "Pertolongan Pertama (Tim P3K)", to: "/petugas/p3k" },
-                    { label: "Fire Fighter (Tim Fire Fighter)", to: "/petugas/pemadaman" },
+                    { label: "Pemadaman (Tim Fire Fighter)", to: "/petugas/pemadaman" },
+                    { label: "Pemadaman (PIC Ruang Pompa)", to: "/petugas/pemadaman" },
                     { label: "Koordinasi (Kepala TKTD)", to: "/petugas/koordinasi" },
                     { label: "Laporan Kejadian (Unit K3 / GA)", to: "/petugas/laporan" },
                   ].map((p, idx) => (

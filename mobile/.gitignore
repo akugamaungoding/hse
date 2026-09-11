@@ -1,0 +1,57 @@
+# dependencies
+node_modules/
+yarn.lock
+package-lock.json
+
+# logs
+logs
+.log
+npm-debug.log
+yarn-debug.log*
+yarn-error.log*
+
+# macOS
+.DS_Store
+
+# environment
+.env
+.env.local
+.env..local
+
+# react native
+.expo/
+.expo-shared/
+
+# metro bundler
+.metro-health-check
+
+# testing
+coverage/
+
+# temporary
+*.tmp
+*.temp
+
+# IDE
+.vscode/
+.idea/
+
+# iOS
+ios/build/
+ios/Pods/
+ios/DerivedData/
+*.xcworkspace
+
+# Android
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+*.keystore
+
+# bundle
+*.jsbundle
+
+# misc
+*.swp
+*.swo

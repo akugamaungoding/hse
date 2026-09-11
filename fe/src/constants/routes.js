@@ -6,6 +6,7 @@ export const ROLE_HOME = {
   PIC_ASSEMBLY_POINT: "/petugas/assembly-point",
   TIM_P3K: "/petugas/p3k",
   TIM_FIRE_FIGHTER: "/petugas/pemadaman",
+  PIC_RUANG_POMPA: "/petugas/pemadaman",
   KEPALA_KTID: "/petugas/koordinasi",
   UNIT_K3: "/petugas/laporan",
   GA: "/petugas/laporan",

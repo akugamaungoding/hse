@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "SHE Mobile",
+    "slug": "she-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "jsEngine": "hermes",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "useCleartextTraffic": true,
+      "supportsTablet": true,
+      "bundleIdentifier": "com.astratech.shemobile"
+    },
+    "android": {
+      "useCleartextTraffic": true,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "enableProguardInReleaseBuilds": true,
+      "edgeToEdgeEnabled": true,
+      "package": "com.astratech.shemobile"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
