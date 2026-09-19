@@ -10,11 +10,17 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.png", "icon.png", "apple-touch-icon.png", "denah/**/*"],
+      includeAssets: [
+        "favicon.png",
+        "icon.png",
+        "apple-touch-icon.png",
+        "denah/**/*",
+      ],
       manifest: {
-        name: "HSE Mobile - Tanggap Darurat Politeknik Astra",
-        short_name: "HSE Mobile",
-        description: "Aplikasi Keselamatan, Kesehatan Kerja dan Lingkungan (K3/HSE) Politeknik Astra",
+        name: "SHE Mobile - Tanggap Darurat Politeknik Astra",
+        short_name: "SHE Mobile",
+        description:
+          "Aplikasi Keselamatan, Kesehatan Kerja dan Lingkungan Politeknik Astra",
         theme_color: "#0140c7",
         background_color: "#0140c7",
         display: "standalone",
@@ -26,15 +32,15 @@ export default defineConfig({
             src: "/icon-192.png",
             sizes: "192x192",
             type: "image/png",
-            purpose: "any maskable"
+            purpose: "any maskable",
           },
           {
             src: "/icon-512.png",
             sizes: "512x512",
             type: "image/png",
-            purpose: "any maskable"
-          }
-        ]
+            purpose: "any maskable",
+          },
+        ],
       },
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,webp}"],
@@ -47,12 +53,12 @@ export default defineConfig({
               cacheName: "google-fonts-cache",
               expiration: {
                 maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365
+                maxAgeSeconds: 60 * 60 * 24 * 365,
               },
               cacheableResponse: {
-                statuses: [0, 200]
-              }
-            }
+                statuses: [0, 200],
+              },
+            },
           },
           {
             urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
@@ -61,24 +67,24 @@ export default defineConfig({
               cacheName: "gstatic-fonts-cache",
               expiration: {
                 maxEntries: 20,
-                maxAgeSeconds: 60 * 60 * 24 * 365
+                maxAgeSeconds: 60 * 60 * 24 * 365,
               },
               cacheableResponse: {
-                statuses: [0, 200]
-              }
-            }
-          }
-        ]
-      }
-    })
+                statuses: [0, 200],
+              },
+            },
+          },
+        ],
+      },
+    }),
   ],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src")
-    }
+      "@": path.resolve(__dirname, "./src"),
+    },
   },
   server: {
     host: true, // Listen on 0.0.0.0 so phone can connect via Wi-Fi IP
-    port: 5173
-  }
+    port: 5173,
+  },
 });

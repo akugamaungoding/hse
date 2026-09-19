@@ -127,16 +127,28 @@ namespace TanggapDaruratApi.Services.Implementations
 
         public async Task<(bool Success, string Message)> PengumumanAmanAsync(int id, string actorUsername)
         {
+            var kejadian = await _kejadianRepository.GetByIdAsync(id);
+            if (kejadian == null)
+                return (false, "Kejadian tidak ditemukan.");
+
+            if (kejadian.Status != "Aman")
+                return (false, "Kondisi belum ditetapkan aman oleh Kepala KTID.");
+
+            if (kejadian.WaktuDitetapkanAman == null)
+                return (false, "Penetapan kondisi aman oleh Kepala KTID belum tercatat.");
+
+            if (kejadian.WaktuPengumumanAman != null)
+                return (true, "Pengumuman kondisi aman sudah pernah dikirim.");
+
             var ok = await _kejadianRepository.SetPengumumanAmanAsync(id, actorUsername);
             if (!ok)
-                return (false, "Kondisi belum ditetapkan aman oleh Kepala KTID.");
+                return (false, "Gagal mencatat pengumuman kondisi aman. Silakan coba lagi atau hubungi administrator.");
 
             try
             {
-                var kejadian = await _kejadianRepository.GetByIdAsync(id);
                 await _notifikasiRepository.CreateBroadcastAsync(
                     "Kondisi Aman",
-                    $"Kondisi di {kejadian?.Lokasi} telah dinyatakan aman. Civitas diizinkan kembali beraktivitas di dalam gedung.",
+                    $"Kondisi di {kejadian.Lokasi} telah dinyatakan aman. Civitas diizinkan kembali beraktivitas di dalam gedung.",
                     "Aman",
                     id,
                     actorUsername);

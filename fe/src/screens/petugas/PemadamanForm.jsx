@@ -255,10 +255,18 @@ export function PemadamanForm() {
                     >
                       <span className="text-xs font-bold text-red-800">Skala Besar</span>
                       <span className="text-[10px] text-gray-600">
-                        Dilakukan evakuasi gedung & aktivasi Hydrant Utama
+                        Dilakukan evakuasi gedung &amp; aktivasi Hydrant Utama
                       </span>
                     </button>
                   </div>
+                  {skalaKebakaran === "SKALA_BESAR" && (
+                    <div className="bg-red-50 border border-red-200 rounded-xl p-2.5 flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
+                      <p className="text-[11px] text-red-700 font-bold">
+                        ⚠ Perubahan ke Skala Besar otomatis mengirim notifikasi ke PIC Control Room untuk memicu evakuasi menyeluruh.
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Sumber Api */}

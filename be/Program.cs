@@ -41,7 +41,19 @@ namespace TanggapDaruratApi
 
             if (!string.IsNullOrEmpty(decryptKeyConn) && !string.IsNullOrEmpty(rawConn))
             {
-                conn = PolmanAstraLibrary.PolmanAstraLibrary.Decrypt(rawConn, decryptKeyConn);
+                try
+                {
+                    conn = PolmanAstraLibrary.PolmanAstraLibrary.Decrypt(rawConn, decryptKeyConn);
+                }
+                catch (FormatException)
+                {
+                    // Connection string is plain text (not base64 ciphertext)
+                    conn = rawConn;
+                }
+                catch (Exception)
+                {
+                    conn = rawConn;
+                }
             }
             else
             {
@@ -61,6 +73,7 @@ namespace TanggapDaruratApi
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
                 {
+                    options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
                     options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
                 });
             builder.Services.AddEndpointsApiExplorer();

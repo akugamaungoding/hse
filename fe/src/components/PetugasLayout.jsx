@@ -18,32 +18,30 @@ export function PetugasLayout({ title, subtitle, children }) {
       <div className="w-full h-full bg-[#f9fafb] font-['Poppins',sans-serif] flex flex-col overflow-hidden">
         <div style={{ paddingTop: "calc(0.875rem + env(safe-area-inset-top, 0px))" }} className="bg-[#0140c7] text-white px-4 pb-3.5 shrink-0 relative z-10 shadow-md">
           <div className="flex items-center justify-between">
-            <div className="min-w-0">
-              <h1 className="font-bold text-sm leading-tight truncate">{title}</h1>
-              {subtitle && <p className="text-blue-200 text-[10px] mt-0.5 truncate">{subtitle}</p>}
+            <div className="flex items-center gap-2 min-w-0">
+              <button
+                onClick={() => (window.history.length > 1 ? navigate(-1) : navigate("/utama"))}
+                className="p-1.5 bg-white/15 rounded-lg hover:bg-white/25 transition-colors text-white shrink-0 flex items-center justify-center"
+                title="Kembali ke Halaman Sebelumnya"
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </button>
+              <div className="min-w-0">
+                <h1 className="font-bold text-sm leading-tight truncate">{title}</h1>
+                {subtitle && <p className="text-blue-200 text-[10px] mt-0.5 truncate">{subtitle}</p>}
+              </div>
             </div>
             <div className="text-right shrink-0">
               <p className="text-xs font-semibold leading-tight">{nama}</p>
               <div className="flex items-center gap-1.5 justify-end mt-1">
                 <span className="text-[9px] text-blue-200">{roleName}</span>
-                {roleCode === "SUPER_ADMIN" ? (
-                  <button
-                    onClick={() => navigate("/utama")}
-                    className="p-1 bg-white/15 rounded hover:bg-white/25 transition-colors flex items-center gap-1 text-[9px] font-bold"
-                    title="Kembali ke Utama"
-                  >
-                    <ArrowLeft className="w-3 h-3" />
-                    <span>Kembali</span>
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleLogout}
-                    className="p-1 bg-white/15 rounded hover:bg-white/25 transition-colors"
-                    title="Keluar"
-                  >
-                    <LogOut className="w-3 h-3" />
-                  </button>
-                )}
+                <button
+                  onClick={handleLogout}
+                  className="p-1 bg-white/15 rounded hover:bg-white/25 transition-colors"
+                  title="Keluar"
+                >
+                  <LogOut className="w-3 h-3" />
+                </button>
               </div>
             </div>
           </div>

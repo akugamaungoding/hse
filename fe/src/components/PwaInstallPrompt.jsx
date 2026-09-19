@@ -34,7 +34,10 @@ export function PwaInstallPrompt() {
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
 
     return () => {
-      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+      window.removeEventListener(
+        "beforeinstallprompt",
+        handleBeforeInstallPrompt,
+      );
     };
   }, []);
 
@@ -73,7 +76,7 @@ export function PwaInstallPrompt() {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-xs font-bold font-['Poppins',sans-serif] leading-tight">
-              Install HSE Mobile di HP
+              Install SHE Mobile di HP
             </p>
             <p className="text-[11px] text-blue-100 truncate mt-0.5 font-['Poppins',sans-serif]">
               Akses cepat layar penuh seperti aplikasi native
@@ -116,13 +119,18 @@ export function PwaInstallPrompt() {
               <li className="flex items-start gap-2">
                 <span className="font-bold text-[#0140c7]">2.</span>
                 <span>
-                  Ketuk tombol <strong>Bagikan (Share)</strong> di bagian bawah layar.
+                  Ketuk tombol <strong>Bagikan (Share)</strong> di bagian bawah
+                  layar.
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="font-bold text-[#0140c7]">3.</span>
                 <span>
-                  Gulir ke bawah dan pilih <strong>"Tambahkan ke Layar Utama" (Add to Home Screen)</strong>.
+                  Gulir ke bawah dan pilih{" "}
+                  <strong>
+                    "Tambahkan ke Layar Utama" (Add to Home Screen)
+                  </strong>
+                  .
                 </span>
               </li>
             </ol>

@@ -1,5 +1,3 @@
-// Asset parameter specifications and OK/NOK status mappings according to HSE requirements
-
 export const ASSET_TYPE_NAMES = {
   APAR: "APAR",
   HYDRANT_BOX: "Hydrant Box",

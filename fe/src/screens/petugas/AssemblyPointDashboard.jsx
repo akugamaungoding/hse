@@ -23,6 +23,7 @@ export function AssemblyPointDashboard() {
 
   // P3K Need Toggle state for PIC Assembly Point
   const [perluP3K, setPerluP3K] = useState(false);
+  const [perluAmbulans, setPerluAmbulans] = useState(false);
   const [p3kCatatan, setP3kCatatan] = useState("");
   const [p3kSubmitted, setP3kSubmitted] = useState(false);
 
@@ -237,7 +238,7 @@ export function AssemblyPointDashboard() {
           <span className="text-[10px] text-gray-400 font-bold">PIC Assembly Point</span>
         </div>
 
-        <form onSubmit={handleP3KSubmit} className="flex flex-col gap-2.5">
+        <form onSubmit={handleP3KSubmit} className="flex flex-col gap-3">
           <label className="flex items-center gap-2 cursor-pointer bg-red-50 p-2.5 rounded-xl border border-red-100">
             <input
               type="checkbox"
@@ -251,23 +252,53 @@ export function AssemblyPointDashboard() {
           </label>
 
           {perluP3K && (
-            <textarea
-              value={p3kCatatan}
-              onChange={(e) => setP3kCatatan(e.target.value)}
-              placeholder="Jelaskan kebutuhan P3K atau jumlah korban cedera..."
-              className="w-full border border-gray-200 rounded-xl p-2.5 text-xs bg-gray-50 outline-none font-['Poppins',sans-serif]"
-            />
+            <>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-gray-700">Kebutuhan Ambulans</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setPerluAmbulans(true)}
+                    className={`py-2 rounded-xl text-xs font-bold transition-colors border ${
+                      perluAmbulans
+                        ? "bg-red-600 text-white border-red-600"
+                        : "bg-white text-gray-600 border-gray-200"
+                    }`}
+                  >
+                    Perlu Ambulance
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPerluAmbulans(false)}
+                    className={`py-2 rounded-xl text-xs font-bold transition-colors border ${
+                      !perluAmbulans
+                        ? "bg-gray-100 text-gray-700 border-gray-200"
+                        : "bg-white text-gray-600 border-gray-200"
+                    }`}
+                  >
+                    Tidak Perlu Ambulance
+                  </button>
+                </div>
+              </div>
+
+              <textarea
+                value={p3kCatatan}
+                onChange={(e) => setP3kCatatan(e.target.value)}
+                placeholder="Jelaskan kebutuhan P3K atau kondisi korban cedera..."
+                className="w-full border border-gray-200 rounded-xl p-2.5 text-xs bg-gray-50 outline-none font-['Poppins',sans-serif] min-h-[70px]"
+              />
+            </>
           )}
 
           <button
             type="submit"
             className="bg-red-600 text-white rounded-xl h-10 font-bold text-xs shadow-sm hover:bg-red-700 transition-colors"
           >
-            Submit Kebutuhan P3K
+            Submit Kebutuhan P3K &amp; Kirim Notifikasi (Tim P3K &amp; Super Admin)
           </button>
           {p3kSubmitted && (
             <p className="text-xs text-green-600 font-bold text-center">
-              Laporan kebutuhan P3K berhasil dikirim ke Tim P3K & Coordinator!
+              ✓ Laporan korban &amp; notifikasi otomatis telah terkirim ke Tim P3K &amp; Super Admin (Unit K3)!
             </p>
           )}
         </form>

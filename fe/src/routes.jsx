@@ -52,12 +52,34 @@ const ALL_USERS = [
 // Strict Asset Managers: Only SUPER_ADMIN, SHE_AGENT, and UNIT_K3
 const ASSET_MANAGERS = ["SUPER_ADMIN", "SHE_AGENT", "UNIT_K3"];
 
+function GlobalErrorBoundary() {
+  return (
+    <div className="min-h-screen bg-red-50 p-6 flex flex-col items-center justify-center text-center font-['Poppins',sans-serif]">
+      <div className="bg-white rounded-3xl p-6 shadow-xl max-w-sm w-full flex flex-col items-center gap-4 border border-red-100">
+        <div className="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center text-red-600 text-2xl font-bold">
+          ⚠️
+        </div>
+        <h2 className="font-bold text-lg text-gray-800">Terjadi Kesalahan Aplikasi</h2>
+        <p className="text-xs text-gray-500">
+          Sistem mengalami kendala saat memuat halaman ini. Silakan kembali ke menu utama.
+        </p>
+        <a
+          href="/utama"
+          className="w-full py-3 bg-[#0140c7] text-white rounded-xl font-bold text-xs shadow-md shadow-blue-200"
+        >
+          Kembali ke Menu Utama
+        </a>
+      </div>
+    </div>
+  );
+}
+
 export const router = createBrowserRouter([
-  { path: "/", Component: Splash },
-  { path: "/login", Component: Login },
+  { path: "/", Component: Splash, errorElement: <GlobalErrorBoundary /> },
+  { path: "/login", Component: Login, errorElement: <GlobalErrorBoundary /> },
 
   // Base Screens (Accessible according to matrix)
-  { path: "/utama", element: <RoleGuard allowedRoles={ALL_USERS}><Utama /></RoleGuard> },
+  { path: "/utama", element: <RoleGuard allowedRoles={ALL_USERS}><Utama /></RoleGuard>, errorElement: <GlobalErrorBoundary /> },
   { path: "/denah", element: <RoleGuard allowedRoles={ALL_USERS}><Denah /></RoleGuard> },
   { path: "/profil", element: <RoleGuard allowedRoles={ALL_USERS}><Profil /></RoleGuard> },
   { path: "/notifikasi", element: <RoleGuard allowedRoles={ALL_USERS}><Notifikasi /></RoleGuard> },
@@ -99,8 +121,8 @@ export const router = createBrowserRouter([
   { path: "/darurat/assembly", element: <RoleGuard allowedRoles={["CIVITAS", "PIC_ASSEMBLY_POINT", "SUPER_ADMIN"]}><AbsensiAssembly /></RoleGuard> },
 
   // Specific Role Task Dashboards (Strict Access Control)
-  { path: "/petugas/validasi", element: <RoleGuard allowedRoles={["TIM_IDENTIFIKASI", "SUPER_ADMIN"]}><ValidasiKejadian /></RoleGuard> },
-  { path: "/petugas/control-room", element: <RoleGuard allowedRoles={["PIC_CONTROL_ROOM", "SUPER_ADMIN"]}><ControlRoomDashboard /></RoleGuard> },
+  { path: "/petugas/validasi", element: <RoleGuard allowedRoles={["TIM_IDENTIFIKASI", "UNIT_K3", "SUPER_ADMIN"]}><ValidasiKejadian /></RoleGuard> },
+  { path: "/petugas/control-room", element: <RoleGuard allowedRoles={["PIC_CONTROL_ROOM", "UNIT_K3", "SUPER_ADMIN"]}><ControlRoomDashboard /></RoleGuard> },
   { path: "/petugas/evakuasi", element: <RoleGuard allowedRoles={["FLOOR_WARDEN", "KEPALA_TKTD", "UNIT_K3", "SUPER_ADMIN"]}><EvakuasiLantai /></RoleGuard> },
   { path: "/petugas/assembly-point", element: <RoleGuard allowedRoles={["PIC_ASSEMBLY_POINT", "KEPALA_TKTD", "UNIT_K3", "SUPER_ADMIN"]}><AssemblyPointDashboard /></RoleGuard> },
   { path: "/petugas/p3k", element: <RoleGuard allowedRoles={["TIM_P3K", "KEPALA_TKTD", "UNIT_K3", "SUPER_ADMIN"]}><P3KForm /></RoleGuard> },

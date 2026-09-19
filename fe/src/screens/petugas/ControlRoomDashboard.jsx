@@ -45,6 +45,7 @@ export function ControlRoomDashboard() {
   const [loadingList, setLoadingList] = useState(true);
   const [listError, setListError] = useState("");
   const [actionState, setActionState] = useState({});
+  const [pengumumanAmanSuccess, setPengumumanAmanSuccess] = useState("");
   const mountedRef = useRef(true);
 
   // Badge Filter State
@@ -109,7 +110,9 @@ export function ControlRoomDashboard() {
 
   const menungguDarurat = filteredKejadianList.filter((k) => k.status === "Tervalidasi");
   const sedangBerjalan = filteredKejadianList.filter((k) => SEDANG_BERJALAN_STATUS.includes(k.status));
-  const menungguAman = filteredKejadianList.filter((k) => k.status === "Aman");
+  const menungguAman = filteredKejadianList.filter(
+    (k) => k.status === "Aman" && !k.waktuPengumumanAman
+  );
 
   const setCardState = (id, patch) => {
     setActionState((prev) => ({ ...prev, [id]: { ...prev[id], ...patch } }));
@@ -139,9 +142,11 @@ export function ControlRoomDashboard() {
 
   const handlePengumumanAman = async (id) => {
     setCardState(id, { loading: true, error: "" });
+    setPengumumanAmanSuccess("");
     try {
-      await kejadianServices.pengumumanAman(id);
+      const res = await kejadianServices.pengumumanAman(id);
       setCardState(id, { loading: false, arming: false, error: "" });
+      setPengumumanAmanSuccess(res?.message || "Pengumuman kondisi aman berhasil dikirim ke seluruh civitas.");
       await load();
     } catch (err) {
       setCardState(id, {
@@ -232,12 +237,50 @@ export function ControlRoomDashboard() {
                   <p className="text-xs text-gray-600 bg-gray-50 rounded-xl p-3">{k.catatanValidasi}</p>
                 )}
 
+                {/* Klasifikasi Skala Kebakaran & Pengumuman (Revisi 4.1.a) */}
+                <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 flex flex-col gap-2">
+                  <p className="text-xs font-bold text-orange-900">Klasifikasi Skala & Scope Pengumuman:</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setCardState(k.kejadianId, { skala: "Kecil" })}
+                      className={`py-2 rounded-xl text-xs font-bold border transition-colors ${
+                        (state.skala || "Besar") === "Kecil"
+                          ? "bg-orange-600 text-white border-orange-600"
+                          : "bg-white text-gray-700 border-gray-200"
+                      }`}
+                    >
+                      Skala Kecil (Lokal)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCardState(k.kejadianId, { skala: "Besar" })}
+                      className={`py-2 rounded-xl text-xs font-bold border transition-colors ${
+                        (state.skala || "Besar") === "Besar"
+                          ? "bg-red-600 text-white border-red-600"
+                          : "bg-white text-gray-700 border-gray-200"
+                      }`}
+                    >
+                      Skala Besar (Evakuasi Total)
+                    </button>
+                  </div>
+                  {(state.skala === "Kecil") ? (
+                    <p className="text-[11px] text-orange-800">
+                      ℹ Pengumuman lokal untuk lokasi spesifik <strong>({k.lokasi})</strong>. Evakuasi menyeluruh tidak diperlukan.
+                    </p>
+                  ) : (
+                    <p className="text-[11px] text-red-800">
+                      ⚠ Sirine dan pengumuman evakuasi menyeluruh akan disiarkan ke seluruh gedung.
+                    </p>
+                  )}
+                </div>
+
                 {state.arming && (
                   <div className="bg-yellow-50 border border-yellow-300 rounded-xl p-3">
                     <p className="text-xs font-bold text-yellow-800">
-                      Konfirmasi pengumuman darurat ke seluruh gedung?
+                      Konfirmasi pengumuman ({state.skala === "Kecil" ? "Skala Kecil / Lokal" : "Evakuasi Total Gedung"})?
                     </p>
-                    <p className="text-[10px] text-yellow-600 mt-1">Klik tombol sekali lagi untuk mengumumkan.</p>
+                    <p className="text-[10px] text-yellow-600 mt-1">Klik tombol sekali lagi untuk memproses.</p>
                   </div>
                 )}
 
@@ -260,7 +303,11 @@ export function ControlRoomDashboard() {
                     ) : (
                       <>
                         <Megaphone className="w-4 h-4" />
-                        {state.arming ? "KONFIRMASI PENGUMUMAN" : "Umumkan Darurat ke Seluruh Gedung"}
+                        {state.arming
+                          ? "KONFIRMASI PENGUMUMAN"
+                          : state.skala === "Kecil"
+                          ? "Umumkan Pengondisian Skala Kecil"
+                          : "Umumkan Evakuasi Seluruh Gedung"}
                       </>
                     )}
                   </button>
@@ -354,6 +401,13 @@ export function ControlRoomDashboard() {
           <ShieldCheck className="w-4 h-4 text-green-600" />
           <h2 className="font-bold text-sm text-gray-800">Menunggu Pengumuman Aman</h2>
         </div>
+
+        {pengumumanAmanSuccess && (
+          <div className="bg-green-50 border border-green-200 rounded-2xl p-3 flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-green-600 shrink-0" />
+            <p className="text-xs text-green-800 font-medium">{pengumumanAmanSuccess}</p>
+          </div>
+        )}
 
         {menungguAman.length === 0 && !loadingList ? (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 text-center">

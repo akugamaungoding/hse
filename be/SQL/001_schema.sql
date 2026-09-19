@@ -778,8 +778,9 @@ BEGIN
     SET kej_waktu_pengumuman_aman = GETDATE(),
         kej_modified_by = @ModifiedBy,
         kej_modified_date = GETDATE()
-    WHERE kej_id = @Id AND kej_status = 'Aman';
-
+    WHERE kej_id = @Id AND kej_status = 'Aman'
+      AND kej_waktu_ditetapkan_aman IS NOT NULL
+      AND kej_waktu_pengumuman_aman IS NULL;
     SELECT @@ROWCOUNT AS affected;
 END;
 GO

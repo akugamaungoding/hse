@@ -217,19 +217,34 @@ export function P3KForm() {
               { }              <div className="flex flex-col gap-2 pt-2 border-t border-gray-100">
                 <label className="font-['Poppins',sans-serif] font-bold text-sm text-gray-800 flex items-center gap-2">
                   <Ambulance className="w-4 h-4 text-gray-400" />
-                  Perlu Ambulans?
+                  Pilihan Kebutuhan Ambulans
                 </label>
-                <button
-                  type="button"
-                  onClick={() => updateField("perluAmbulans", !form.perluAmbulans)}
-                  className={`w-full h-11 rounded-xl text-sm font-bold font-['Poppins',sans-serif] transition-colors border flex items-center justify-center gap-2 ${form.perluAmbulans
-                    ? "bg-yellow-100 text-yellow-700 border-yellow-200"
-                    : "bg-white text-gray-500 border-gray-200"
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => updateField("perluAmbulans", true)}
+                    className={`h-11 rounded-xl text-sm font-bold font-['Poppins',sans-serif] transition-colors border flex items-center justify-center gap-2 ${
+                      form.perluAmbulans
+                        ? "bg-red-600 text-white border-red-600 shadow-sm"
+                        : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50"
                     }`}
-                >
-                  {form.perluAmbulans && <CheckCircle2 className="w-4 h-4" />}
-                  {form.perluAmbulans ? "Ya, Ambulans Dibutuhkan" : "Tidak Perlu Ambulans"}
-                </button>
+                  >
+                    {form.perluAmbulans && <CheckCircle2 className="w-4 h-4" />}
+                    Perlu Ambulance
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => updateField("perluAmbulans", false)}
+                    className={`h-11 rounded-xl text-sm font-bold font-['Poppins',sans-serif] transition-colors border flex items-center justify-center gap-2 ${
+                      !form.perluAmbulans
+                        ? "bg-green-600 text-white border-green-600 shadow-sm"
+                        : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50"
+                    }`}
+                  >
+                    {!form.perluAmbulans && <CheckCircle2 className="w-4 h-4" />}
+                    Tidak Perlu Ambulance
+                  </button>
+                </div>
                 {waktuPanggilAmbulans && (
                   <p className="text-[11px] text-gray-500 font-['Poppins',sans-serif]">
                     Ambulans telah dipanggil pada {fmtJam(waktuPanggilAmbulans)}

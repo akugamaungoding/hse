@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PetugasLayout } from "../../components/PetugasLayout";
-import { FileText, CheckCircle2, Clock, History, MapPin, ChevronDown, ChevronUp, AlertTriangle } from "lucide-react";
+import { FileText, CheckCircle2, Clock, History, MapPin, ChevronDown, ChevronUp, AlertTriangle, Camera } from "lucide-react";
 import { kejadianServices } from "@/services/kejadianServices";
 import { laporanServices } from "@/services/laporanServices";
 import { KEJADIAN_STATUS_LABEL } from "@/constants/routes";
@@ -36,7 +36,8 @@ export function LaporanKejadian() {
       .getAll({ status: "Aman", pageSize: 20 })
       .then(res => {
         if (mountedRef.current) {
-          setPerluLaporan(Array.isArray(res?.data) ? res.data : []);
+          const rows = Array.isArray(res?.data) ? res.data : [];
+          setPerluLaporan(rows.filter(k => k.waktuPengumumanAman));
           setPerluError("");
         }
       })
@@ -206,14 +207,45 @@ export function LaporanKejadian() {
                 />
               </div>
 
-              <div className="flex flex-col gap-2">
-                <label className="font-bold text-xs text-gray-800">Tindak Lanjut</label>
-                <textarea
-                  placeholder="Rekomendasi atau tindak lanjut yang perlu dilakukan (opsional)..."
-                  value={form.tindakLanjut || ""}
-                  onChange={e => setCardForm(k.kejadianId, { tindakLanjut: e.target.value })}
-                  className="border border-gray-200 rounded-xl p-3 text-sm bg-white outline-none w-full shadow-sm min-h-[70px]"
-                />
+              {/* Dokumen Foto Unit K3 (Revisi 7.1.a, 7.1.b, 7.1.c) */}
+              <div className="bg-blue-50/60 border border-blue-100 rounded-xl p-3 flex flex-col gap-2.5">
+                <p className="font-bold text-xs text-blue-900 flex items-center gap-1.5">
+                  <Camera className="w-4 h-4 text-[#0140c7]" />
+                  Dokumentasi Foto Laporan (Unit K3)
+                </p>
+
+                <div className="flex flex-col gap-2">
+                  <label className="text-[11px] font-semibold text-gray-700">1. Foto Kegiatan Evakuasi</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={e => setCardForm(k.kejadianId, { fotoEvakuasi: e.target.files?.[0]?.name || "Foto_Evakuasi.jpg" })}
+                    className="text-xs text-gray-600 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"
+                  />
+                  {form.fotoEvakuasi && <p className="text-[10px] text-green-600 font-bold">✓ Terlampir: {form.fotoEvakuasi}</p>}
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <label className="text-[11px] font-semibold text-gray-700">2. Foto Absensi di Assembly Point</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={e => setCardForm(k.kejadianId, { fotoAssemblyPoint: e.target.files?.[0]?.name || "Foto_AssemblyPoint.jpg" })}
+                    className="text-xs text-gray-600 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"
+                  />
+                  {form.fotoAssemblyPoint && <p className="text-[10px] text-green-600 font-bold">✓ Terlampir: {form.fotoAssemblyPoint}</p>}
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <label className="text-[11px] font-semibold text-gray-700">3. Foto Kondisi Setelah Api Padam</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={e => setCardForm(k.kejadianId, { fotoApiPadam: e.target.files?.[0]?.name || "Foto_ApiPadam.jpg" })}
+                    className="text-xs text-gray-600 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"
+                  />
+                  {form.fotoApiPadam && <p className="text-[10px] text-green-600 font-bold">✓ Terlampir: {form.fotoApiPadam}</p>}
+                </div>
               </div>
 
               {form.error && <p className="text-xs text-red-600 font-medium">{form.error}</p>}
@@ -323,9 +355,20 @@ export function LaporanKejadian() {
                         </div>
                       )}
                       {detail.data.waktuLaporan && (
-                        <div className="flex items-center gap-1.5 text-gray-500">
-                          <Clock className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                          <span>Laporan dibuat {fmtTime(detail.data.waktuLaporan)}, {fmtDate(detail.data.waktuLaporan)}</span>
+                        <div className="flex items-center justify-between gap-1.5 text-gray-500 pt-1">
+                          <div className="flex items-center gap-1.5">
+                            <Clock className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                            <span>Laporan dibuat {fmtTime(detail.data.waktuLaporan)}, {fmtDate(detail.data.waktuLaporan)}</span>
+                          </div>
+
+                          {/* PDF Export Button (Revisi 6.2) */}
+                          <button
+                            type="button"
+                            onClick={() => window.print()}
+                            className="bg-[#0140c7] text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-sm hover:bg-blue-700 transition-colors"
+                          >
+                            Cetak PDF Laporan
+                          </button>
                         </div>
                       )}
                     </div>

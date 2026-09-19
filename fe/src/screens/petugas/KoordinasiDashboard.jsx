@@ -118,15 +118,20 @@ export function KoordinasiDashboard() {
     }
   };
 
+  const [broadcastSent, setBroadcastSent] = useState(false);
+
   const handleSubmitCatatan = async e => {
     e.preventDefault();
     if (!kejadian?.kejadianId || !catatan.trim()) return;
     setCatatanLoading(true);
     setCatatanError("");
+    setBroadcastSent(false);
     try {
       await koordinasiServices.update(kejadian.kejadianId, catatan.trim());
       setCatatan("");
       setCatatanLoading(false);
+      setBroadcastSent(true);
+      setTimeout(() => setBroadcastSent(false), 4000);
       await loadStatus(kejadian.kejadianId);
     } catch (err) {
       setCatatanLoading(false);
@@ -359,6 +364,11 @@ export function KoordinasiDashboard() {
               className="border border-gray-200 rounded-xl p-3 text-sm bg-white outline-none w-full shadow-sm min-h-[80px] font-['Poppins',sans-serif]"
             />
             {catatanError && <p className="text-xs text-red-600 font-medium">{catatanError}</p>}
+            {broadcastSent && (
+              <p className="text-xs text-green-600 font-bold">
+                ✓ Log koordinasi berhasil disimpan dan dipublikasikan (broadcast) ke seluruh divisi!
+              </p>
+            )}
             <button
               type="submit"
               disabled={catatanLoading || !catatan.trim()}
@@ -370,7 +380,7 @@ export function KoordinasiDashboard() {
                   Mengirim...
                 </>
               ) : (
-                "Kirim Update"
+                "Kirim & Broadcast Update Log"
               )}
             </button>
           </form>
