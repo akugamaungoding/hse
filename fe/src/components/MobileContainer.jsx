@@ -14,7 +14,7 @@ export function MobileContainer({ children }) {
 
   if (isMobile) {
     return (
-      <div className="w-full h-screen bg-white relative overflow-hidden flex flex-col font-['Poppins',sans-serif]">
+      <div className="w-full h-[100dvh] bg-white relative overflow-hidden flex flex-col font-['Poppins',sans-serif]">
         {children}
       </div>
     );

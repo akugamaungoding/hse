@@ -28,7 +28,7 @@ export function BottomNav() {
     label: "Profil",
     badge: 0
   }];
-  return <div className="absolute bottom-0 left-0 w-full bg-white border-t border-gray-100 flex justify-around items-center h-[72px] pb-2 pt-2 z-50 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+  return <div style={{ paddingBottom: "max(8px, env(safe-area-inset-bottom))" }} className="absolute bottom-0 left-0 w-full bg-white border-t border-gray-100 flex justify-around items-center h-[72px] pt-2 z-50 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
       {tabs.map(tab => {
       const isActive = path === tab.to;
       const Icon = tab.icon;

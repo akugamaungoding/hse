@@ -1,0 +1,9 @@
+{
+  "appId": "com.safetyProjek.app",
+  "appName": "she-mobile",
+  "webDir": "dist",
+   "server": {
+    "cleartext": true,
+    "androidScheme": "http"
+  }
+}

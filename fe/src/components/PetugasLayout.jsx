@@ -16,7 +16,7 @@ export function PetugasLayout({ title, subtitle, children }) {
   return (
     <MobileContainer>
       <div className="w-full h-full bg-[#f9fafb] font-['Poppins',sans-serif] flex flex-col overflow-hidden">
-        <div className="bg-[#0140c7] text-white px-4 py-3.5 shrink-0 relative z-10 shadow-md">
+        <div style={{ paddingTop: "calc(0.875rem + env(safe-area-inset-top, 0px))" }} className="bg-[#0140c7] text-white px-4 pb-3.5 shrink-0 relative z-10 shadow-md">
           <div className="flex items-center justify-between">
             <div className="min-w-0">
               <h1 className="font-bold text-sm leading-tight truncate">{title}</h1>

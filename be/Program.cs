@@ -128,9 +128,19 @@ namespace TanggapDaruratApi
             {
                 options.AddPolicy("AllowSpecificOrigin", builderCors =>
                 {
-                    builderCors.WithOrigins(corsOrigin!)
-                           .AllowAnyHeader()
-                           .AllowAnyMethod();
+                    if (builder.Environment.IsDevelopment())
+                    {
+                        builderCors.SetIsOriginAllowed(_ => true)
+                                   .AllowAnyHeader()
+                                   .AllowAnyMethod()
+                                   .AllowCredentials();
+                    }
+                    else
+                    {
+                        builderCors.WithOrigins(corsOrigin!)
+                                   .AllowAnyHeader()
+                                   .AllowAnyMethod();
+                    }
                 });
             });
 
@@ -171,18 +181,18 @@ namespace TanggapDaruratApi
                 };
             });
 
-            try
-            {
-                Log.Logger = new LoggerConfiguration().WriteTo.MSSqlServer(connectionString: conn, sinkOptions: new MSSqlServerSinkOptions
-                {
-                    TableName = "TD_ErrorLog",
-                    AutoCreateSqlTable = true
-                }).MinimumLevel.Warning().CreateLogger();
-                builder.Host.UseSerilog();
-            }
-            catch
-            {
-            }
+            //try
+            //{
+            //    Log.Logger = new LoggerConfiguration().WriteTo.MSSqlServer(connectionString: conn, sinkOptions: new MSSqlServerSinkOptions
+            //    {
+            //        TableName = "TD_ErrorLog",
+            //        AutoCreateSqlTable = true
+            //    }).MinimumLevel.Warning().CreateLogger();
+            //    builder.Host.UseSerilog();
+            //}
+            //catch
+            //{
+            //}
 
             var app = builder.Build();
 
@@ -196,7 +206,10 @@ namespace TanggapDaruratApi
                 app.UseHttpsRedirection();
             }
 
-            app.UseCors("AllowSpecificOrigin");
+            app.UseCors(policy => policy
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
             app.UseAuthentication();
 
             app.Use(async (context, next) =>

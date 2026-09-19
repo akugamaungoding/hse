@@ -1,0 +1,31 @@
+{
+  "name": "HSE Mobile - Tanggap Darurat Politeknik Astra",
+  "short_name": "HSE Mobile",
+  "description": "Aplikasi Tanggap Darurat Keselamatan, Kesehatan Kerja dan Lingkungan Politeknik Astra",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0140c7",
+  "theme_color": "#0140c7",
+  "categories": ["utilities", "productivity", "safety"],
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/png"
+    }
+  ]
+}
