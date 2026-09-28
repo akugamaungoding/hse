@@ -1,14 +1,43 @@
 import { useEffect, useRef, useState } from "react";
 import { PetugasLayout } from "../../components/PetugasLayout";
-import { Flame, Truck, CheckCircle2, AlertTriangle, ShieldCheck, MessageSquare, Droplets, Activity, Gauge, Clock } from "lucide-react";
+import { Flame, Truck, CheckCircle2, AlertTriangle, ShieldCheck, MessageSquare, Droplets, Activity, Gauge, Clock, ChevronDown, ChevronUp } from "lucide-react";
 import { useActiveKejadian } from "@/hooks/useActiveKejadian";
 import { pemadamanServices } from "@/services/pemadamanServices";
+import { kejadianServices } from "@/services/kejadianServices";
 import { useApp } from "@/context/AppContext";
 import { useAuthStore } from "@/store/useAuthStore";
+import { KEJADIAN_STATUS_LABEL } from "@/constants/routes";
 
 function fmtJam(iso) {
   if (!iso) return "-";
   return new Date(iso).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) + " WIB";
+}
+
+const STEPS = [
+  { key: "Menunggu Validasi", label: "Laporan Terkirim", time: (d) => d?.header?.waktuLapor },
+  { key: "Tervalidasi", label: "Divalidasi Tim Identifikasi", time: (d) => d?.header?.waktuValidasi },
+  { key: "Diumumkan", label: "Diumumkan ke Seluruh Gedung", time: (d) => d?.header?.waktuPengumumanDarurat },
+  { key: "Evakuasi", label: "Evakuasi Berlangsung", time: (d) => d?.header?.waktuPengumumanDarurat },
+  { key: "Assembly Point", label: "Pendataan di Assembly Point", time: (d) => d?.assembly?.waktuKonfirmasi },
+  { key: "Penanganan", label: "Penanganan Berlangsung", time: null },
+  { key: "Aman", label: "Kondisi Dinyatakan Aman", time: (d) => d?.header?.waktuPengumumanAman },
+  { key: "Selesai", label: "Laporan Ditutup", time: (d) => d?.laporan?.waktuLaporan },
+];
+
+function fmtWaktuTimeline(iso) {
+  if (!iso) return null;
+  const d = new Date(iso);
+  const dateStr = d.toLocaleDateString("id-ID", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+  const timeStr = d.toLocaleTimeString("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit",
+  }) + " WIB";
+  return `${dateStr} · ${timeStr}`;
 }
 
 export function PemadamanForm() {
@@ -19,6 +48,10 @@ export function PemadamanForm() {
   const isPompaRole = roleCode === "PIC_RUANG_POMPA" || roleCode === "SUPER_ADMIN";
 
   const [loadingAwal, setLoadingAwal] = useState(true);
+
+  // Status & Timeline state
+  const [statusData, setStatusData] = useState(null);
+  const [showTimeline, setShowTimeline] = useState(true);
 
   // Fire scale state: Skala Kecil vs Skala Besar
   const [skalaKebakaran, setSkalaKebakaran] = useState("SKALA_KECIL");
@@ -48,6 +81,7 @@ export function PemadamanForm() {
       setPerluDamkar(false);
       setHasilPemadaman("");
       setWaktuPanggilDamkar(null);
+      setStatusData(null);
       return;
     }
 
@@ -76,6 +110,13 @@ export function PemadamanForm() {
         .finally(() => {
           if (mounted) setLoadingAwal(false);
         });
+
+      kejadianServices
+        .getStatus(kejadianId)
+        .then((res) => {
+          if (mounted) setStatusData(res);
+        })
+        .catch(() => {});
     };
 
     setLoadingAwal(true);
@@ -150,6 +191,109 @@ export function PemadamanForm() {
               <p className="text-xs text-gray-500 mt-0.5">{kejadian.lokasi}</p>
             </div>
           </div>
+
+          {/* Timeline Penanganan */}
+          {(() => {
+            const currentStatus = statusData?.header?.status || kejadian?.status || "Penanganan";
+            const statusIndex = STEPS.findIndex((s) => s.key === currentStatus);
+
+            return (
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex flex-col gap-3">
+                <div
+                  className="flex items-center justify-between cursor-pointer select-none"
+                  onClick={() => setShowTimeline((prev) => !prev)}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-xl bg-orange-50 flex items-center justify-center shrink-0">
+                      <Clock className="w-4 h-4 text-orange-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-['Poppins',sans-serif] font-bold text-sm text-gray-800">
+                        Timeline Penanganan
+                      </h4>
+                      <p className="text-[10px] text-gray-400">
+                        Roadmap &amp; progres tahapan aktivitas darurat
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
+                        currentStatus === "Aman" || currentStatus === "Selesai"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-blue-100 text-blue-700"
+                      }`}
+                    >
+                      {KEJADIAN_STATUS_LABEL[currentStatus] || currentStatus}
+                    </span>
+                    <button
+                      type="button"
+                      className="p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors"
+                      aria-label="Toggle Timeline"
+                    >
+                      {showTimeline ? (
+                        <ChevronUp className="w-4 h-4" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {showTimeline && (
+                  <div className="flex flex-col gap-3.5 relative pt-2 border-t border-gray-100 mt-1">
+                    <div className="absolute left-[15px] top-4 bottom-4 w-0.5 bg-gray-100" />
+
+                    {STEPS.map((step, i) => {
+                      const done =
+                        statusIndex > i ||
+                        (statusIndex === i && currentStatus === "Selesai");
+                      const active =
+                        statusIndex === i && currentStatus !== "Selesai";
+                      const time = step.time
+                        ? fmtWaktuTimeline(step.time(statusData))
+                        : null;
+
+                      return (
+                        <div
+                          key={step.key}
+                          className={`flex items-start gap-3.5 relative z-10 ${
+                            !done && !active ? "opacity-40" : ""
+                          }`}
+                        >
+                          <div
+                            className={`w-8 h-8 rounded-full border-2 border-white flex items-center justify-center shrink-0 shadow-xs ${
+                              done
+                                ? "bg-green-100 text-green-600"
+                                : active
+                                ? "bg-amber-100 text-amber-600 ring-2 ring-amber-400"
+                                : "bg-gray-100 text-gray-400"
+                            }`}
+                          >
+                            {done ? (
+                              <CheckCircle2 className="w-4 h-4 text-green-600" />
+                            ) : active ? (
+                              <Clock className="w-4 h-4 text-amber-600 animate-spin" />
+                            ) : (
+                              <div className="w-2 h-2 rounded-full bg-gray-400" />
+                            )}
+                          </div>
+                          <div className="pt-0.5 min-w-0 flex-1">
+                            <h5 className="text-xs font-bold text-gray-800 font-['Poppins',sans-serif] leading-tight">
+                              {step.label}
+                            </h5>
+                            <p className="text-[10px] text-gray-500 mt-0.5 font-['Poppins',sans-serif]">
+                              {time || (active ? "Sedang berlangsung..." : "Menunggu")}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
 
           {/* Panel Info Status Pompa – PIC Ruang Pompa & Super Admin */}
           {isPompaRole && pompas.length > 0 && (
