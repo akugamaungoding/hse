@@ -29,6 +29,8 @@ export function P3KForm() {
   const [success, setSuccess] = useState(false);
 
   const submittingRef = useRef(false);
+  const isDirtyRef = useRef(false);
+
   useEffect(() => {
     submittingRef.current = submitting;
   }, [submitting]);
@@ -38,16 +40,17 @@ export function P3KForm() {
       setForm(DEFAULT_FORM);
       setWaktuPanggilAmbulans(null);
       setLoadingAwal(false);
+      isDirtyRef.current = false;
       return;
     }
 
     let mounted = true;
-    const load = () => {
-      if (submittingRef.current) return;
+    const load = (initial = false) => {
+      if (submittingRef.current || (!initial && isDirtyRef.current)) return;
       p3kServices
         .get(kejadianId)
         .then((data) => {
-          if (!mounted || submittingRef.current) return;
+          if (!mounted || submittingRef.current || (!initial && isDirtyRef.current)) return;
           setForm({
             adaKorban: !!data.adaKorban,
             jumlahKorban: data.jumlahKorban === null || data.jumlahKorban === undefined ? "" : String(data.jumlahKorban),
@@ -58,7 +61,7 @@ export function P3KForm() {
           setWaktuPanggilAmbulans(data.waktuPanggilAmbulans || null);
         })
         .catch((err) => {
-          if (!mounted || submittingRef.current) return;
+          if (!mounted || submittingRef.current || (!initial && isDirtyRef.current)) return;
           if (err.response?.status === 404) {
             setForm(DEFAULT_FORM);
             setWaktuPanggilAmbulans(null);
@@ -70,8 +73,8 @@ export function P3KForm() {
     };
 
     setLoadingAwal(true);
-    load();
-    const t = setInterval(load, 8000);
+    load(true);
+    const t = setInterval(() => load(false), 8000);
     return () => {
       mounted = false;
       clearInterval(t);
@@ -79,6 +82,7 @@ export function P3KForm() {
   }, [kejadianId]);
 
   const updateField = (field, value) => {
+    isDirtyRef.current = true;
     setForm((prev) => ({ ...prev, [field]: value }));
     setSuccess(false);
   };
@@ -98,7 +102,12 @@ export function P3KForm() {
         tindakan: form.tindakan || null,
         perluAmbulans: form.perluAmbulans,
       });
+      isDirtyRef.current = false;
       setSuccess(true);
+      const data = await p3kServices.get(kejadianId);
+      if (data?.waktuPanggilAmbulans) {
+        setWaktuPanggilAmbulans(data.waktuPanggilAmbulans);
+      }
     } catch (err) {
       setError(err.response?.data?.message || "Laporan P3K gagal disimpan. Silakan coba lagi.");
     } finally {
@@ -223,25 +232,25 @@ export function P3KForm() {
                   <button
                     type="button"
                     onClick={() => updateField("perluAmbulans", true)}
-                    className={`h-11 rounded-xl text-sm font-bold font-['Poppins',sans-serif] transition-colors border flex items-center justify-center gap-2 ${
+                    className={`h-11 rounded-xl text-xs font-bold font-['Poppins',sans-serif] transition-all border flex items-center justify-center gap-1.5 ${
                       form.perluAmbulans
-                        ? "bg-red-600 text-white border-red-600 shadow-sm"
-                        : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50"
+                        ? "bg-red-600 text-white border-red-600 shadow-md shadow-red-200"
+                        : "bg-red-50 text-red-700 border-red-200 hover:bg-red-100"
                     }`}
                   >
-                    {form.perluAmbulans && <CheckCircle2 className="w-4 h-4" />}
+                    {form.perluAmbulans && <CheckCircle2 className="w-4 h-4 text-white" />}
                     Perlu Ambulance
                   </button>
                   <button
                     type="button"
                     onClick={() => updateField("perluAmbulans", false)}
-                    className={`h-11 rounded-xl text-sm font-bold font-['Poppins',sans-serif] transition-colors border flex items-center justify-center gap-2 ${
+                    className={`h-11 rounded-xl text-xs font-bold font-['Poppins',sans-serif] transition-all border flex items-center justify-center gap-1.5 ${
                       !form.perluAmbulans
-                        ? "bg-green-600 text-white border-green-600 shadow-sm"
-                        : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50"
+                        ? "bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-200"
+                        : "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
                     }`}
                   >
-                    {!form.perluAmbulans && <CheckCircle2 className="w-4 h-4" />}
+                    {!form.perluAmbulans && <CheckCircle2 className="w-4 h-4 text-white" />}
                     Tidak Perlu Ambulance
                   </button>
                 </div>

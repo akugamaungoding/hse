@@ -237,43 +237,54 @@ export function ControlRoomDashboard() {
                   <p className="text-xs text-gray-600 bg-gray-50 rounded-xl p-3">{k.catatanValidasi}</p>
                 )}
 
-                {/* Klasifikasi Skala Kebakaran & Pengumuman (Revisi 4.1.a) */}
-                <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 flex flex-col gap-2">
-                  <p className="text-xs font-bold text-orange-900">Klasifikasi Skala & Scope Pengumuman:</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setCardState(k.kejadianId, { skala: "Kecil" })}
-                      className={`py-2 rounded-xl text-xs font-bold border transition-colors ${
-                        (state.skala || "Besar") === "Kecil"
-                          ? "bg-orange-600 text-white border-orange-600"
-                          : "bg-white text-gray-700 border-gray-200"
-                      }`}
-                    >
-                      Skala Kecil (Lokal)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setCardState(k.kejadianId, { skala: "Besar" })}
-                      className={`py-2 rounded-xl text-xs font-bold border transition-colors ${
-                        (state.skala || "Besar") === "Besar"
-                          ? "bg-red-600 text-white border-red-600"
-                          : "bg-white text-gray-700 border-gray-200"
-                      }`}
-                    >
-                      Skala Besar (Evakuasi Total)
-                    </button>
+                {/* Klasifikasi Skala Kebakaran & Pengumuman (Sembunyikan untuk Gempa Bumi) */}
+                {k.jenisKejadian !== "Gempa Bumi" ? (
+                  <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 flex flex-col gap-2">
+                    <p className="text-xs font-bold text-orange-900">Klasifikasi Skala & Scope Pengumuman:</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setCardState(k.kejadianId, { skala: "Kecil" })}
+                        className={`py-2 rounded-xl text-xs font-bold border transition-colors ${
+                          (state.skala || "Besar") === "Kecil"
+                            ? "bg-orange-600 text-white border-orange-600"
+                            : "bg-white text-gray-700 border-gray-200"
+                        }`}
+                      >
+                        Skala Kecil (Lokal)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setCardState(k.kejadianId, { skala: "Besar" })}
+                        className={`py-2 rounded-xl text-xs font-bold border transition-colors ${
+                          (state.skala || "Besar") === "Besar"
+                            ? "bg-red-600 text-white border-red-600"
+                            : "bg-white text-gray-700 border-gray-200"
+                        }`}
+                      >
+                        Skala Besar (Evakuasi Total)
+                      </button>
+                    </div>
+                    {(state.skala === "Kecil") ? (
+                      <p className="text-[11px] text-orange-800">
+                        ℹ Pengumuman lokal untuk lokasi spesifik <strong>({k.lokasi})</strong>. Evakuasi menyeluruh tidak diperlukan.
+                      </p>
+                    ) : (
+                      <p className="text-[11px] text-red-800">
+                        ⚠ Sirine dan pengumuman evakuasi menyeluruh akan disiarkan ke seluruh gedung.
+                      </p>
+                    )}
                   </div>
-                  {(state.skala === "Kecil") ? (
-                    <p className="text-[11px] text-orange-800">
-                      ℹ Pengumuman lokal untuk lokasi spesifik <strong>({k.lokasi})</strong>. Evakuasi menyeluruh tidak diperlukan.
+                ) : (
+                  <div className="bg-amber-50 border border-amber-300 rounded-xl p-3">
+                    <p className="text-xs font-bold text-amber-900">
+                      EVAKUASI GEMPA BUMI LANGSUNG AKTIF
                     </p>
-                  ) : (
-                    <p className="text-[11px] text-red-800">
-                      ⚠ Sirine dan pengumuman evakuasi menyeluruh akan disiarkan ke seluruh gedung.
+                    <p className="text-[11px] text-amber-800 mt-0.5">
+                      Kejadian Gempa Bumi tidak memerlukan skala. Sirine evakuasi menyeluruh langsung aktif disiarkan.
                     </p>
-                  )}
-                </div>
+                  </div>
+                )}
 
                 {state.arming && (
                   <div className="bg-yellow-50 border border-yellow-300 rounded-xl p-3">

@@ -1,17 +1,34 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router";
 import { PageLayout } from "../../components/PageLayout";
-import { AlertCircle, MapPin, Camera } from "lucide-react";
+import { AlertCircle, MapPin, Camera, X, Check } from "lucide-react";
 import { kejadianServices } from "@/services/kejadianServices";
 
 export function LaporanDarurat() {
   const navigate = useNavigate();
+  const fileInputRef = useRef(null);
   const [jenis, setJenis] = useState("Kebakaran");
   const [lokasi, setLokasi] = useState("");
   const [deskripsi, setDeskripsi] = useState("");
+  const [fotoBase64, setFotoBase64] = useState("");
   const [loading, setLoading] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [error, setError] = useState("");
+
+  const handlePhotoChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      setError("Ukuran foto maksimal 10 MB.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFotoBase64(reader.result);
+      setError("");
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -24,7 +41,12 @@ export function LaporanDarurat() {
     setLoading(true);
     setError("");
     try {
-      const res = await kejadianServices.alert({ jenisKejadian: jenis, lokasi, deskripsi });
+      const res = await kejadianServices.alert({
+        jenisKejadian: jenis,
+        lokasi,
+        deskripsi,
+        fotoUrl: fotoBase64 || undefined
+      });
       navigate(`/darurat/status/${res.kejadianId}`, {
         state: { kodeKejadian: res.kodeKejadian, jenis, lokasi }
       });
@@ -103,10 +125,38 @@ export function LaporanDarurat() {
         <label className="font-['Poppins',sans-serif] font-bold text-sm text-gray-800">
           Bukti Foto (Opsional)
         </label>
-        <button type="button" className="border-2 border-dashed border-gray-300 rounded-xl h-24 flex flex-col items-center justify-center bg-gray-50 text-gray-500 hover:bg-gray-100 transition-colors">
-          <Camera className="w-6 h-6 mb-1" />
-          <span className="text-xs font-medium font-['Poppins',sans-serif]">Ambil / Pilih Foto</span>
-        </button>
+        <input
+          type="file"
+          accept="image/*"
+          capture="environment"
+          ref={fileInputRef}
+          onChange={handlePhotoChange}
+          className="hidden"
+        />
+        {fotoBase64 ? (
+          <div className="relative w-full h-44 rounded-xl overflow-hidden border border-gray-200 bg-black/5 flex items-center justify-center">
+            <img src={fotoBase64} alt="Bukti Kejadian" className="w-full h-full object-cover" />
+            <button
+              type="button"
+              onClick={() => setFotoBase64("")}
+              className="absolute top-2 right-2 w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center shadow-md hover:bg-red-700 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+            <div className="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] font-bold px-2 py-1 rounded-md flex items-center gap-1">
+              <Check className="w-3 h-3 text-green-400" /> Foto Tersimpan
+            </div>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="border-2 border-dashed border-gray-300 rounded-xl h-24 flex flex-col items-center justify-center bg-gray-50 text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer"
+          >
+            <Camera className="w-6 h-6 mb-1 text-[#0140c7]" />
+            <span className="text-xs font-medium font-['Poppins',sans-serif]">Ambil Kamera / Pilih Foto Bukti</span>
+          </button>
+        )}
       </div>
 
       { }      {confirmed && <div className="bg-yellow-50 border border-yellow-300 rounded-xl p-4">

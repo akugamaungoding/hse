@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { PetugasLayout } from "../../components/PetugasLayout";
-import { Building2, Users, CheckCircle2, ArrowRight, Clock } from "lucide-react";
+import { Building2, Users, CheckCircle2, ArrowRight, Clock, Edit2, Filter } from "lucide-react";
 import { useActiveKejadian } from "@/hooks/useActiveKejadian";
 import { evakuasiServices } from "@/services/evakuasiServices";
 
@@ -33,6 +33,8 @@ export function EvakuasiLantai() {
   const [errorAwal, setErrorAwal] = useState("");
   const [catatanMap, setCatatanMap] = useState({});
   const [aksiMap, setAksiMap] = useState({});
+  const [editingMap, setEditingMap] = useState({});
+  const [filterLantai, setFilterLantai] = useState("SEMUA");
 
   const kejadianId = kejadian?.kejadianId;
 
@@ -104,11 +106,7 @@ export function EvakuasiLantai() {
         delete next[evakuasiId];
         return next;
       });
-      setCatatanMap((prev) => {
-        const next = { ...prev };
-        delete next[evakuasiId];
-        return next;
-      });
+      setEditingMap((prev) => ({ ...prev, [evakuasiId]: false }));
     } catch (err) {
       const msg = err.response?.data?.message || "Gagal menandai lantai kosong. Silakan coba lagi.";
       setAksiMap((prev) => ({ ...prev, [evakuasiId]: { loading: false, error: msg } }));
@@ -120,6 +118,12 @@ export function EvakuasiLantai() {
     if (g !== 0) return g;
     return (a.namaLantai || "").localeCompare(b.namaLantai || "");
   });
+
+  const uniqueLantaiList = Array.from(new Set(daftarUrut.map(l => `${l.gedung} - ${l.namaLantai}`)));
+
+  const daftarFiltered = filterLantai === "SEMUA"
+    ? daftarUrut
+    : daftarUrut.filter(l => `${l.gedung} - ${l.namaLantai}` === filterLantai);
 
   const totalLantai = daftarUrut.length;
   const totalKosong = daftarUrut.filter((l) => l.status === "Kosong").length;
@@ -139,17 +143,34 @@ export function EvakuasiLantai() {
 
       {kejadian && (
         <>
-          { }          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex items-start gap-3">
+          {/* Header Ringkasan Kejadian */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex items-start gap-3">
             <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
               <Building2 className="w-5 h-5 text-[#e31212]" />
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <p className="text-[11px] text-gray-400 font-mono">{kejadian.kodeKejadian}</p>
               <h3 className="font-['Poppins',sans-serif] font-bold text-gray-800 text-base leading-tight">
                 {kejadian.jenisKejadian}
               </h3>
               <p className="text-xs text-gray-500 mt-0.5">{kejadian.lokasi}</p>
             </div>
+          </div>
+
+          {/* Selector Filter Lantai Tugas Floor Warden (Issue 18) */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-3 flex items-center gap-2">
+            <Filter className="w-4 h-4 text-gray-400 shrink-0" />
+            <label className="text-xs font-bold text-gray-700 shrink-0 font-['Poppins',sans-serif]">Lantai Tugas:</label>
+            <select
+              value={filterLantai}
+              onChange={e => setFilterLantai(e.target.value)}
+              className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-['Poppins',sans-serif] outline-none"
+            >
+              <option value="SEMUA">Semua Lantai ({totalLantai})</option>
+              {uniqueLantaiList.map(lName => (
+                <option key={lName} value={lName}>{lName}</option>
+              ))}
+            </select>
           </div>
 
           {loadingAwal && (
@@ -159,16 +180,16 @@ export function EvakuasiLantai() {
             </div>
           )}
 
-          {!loadingAwal && errorAwal && daftarUrut.length === 0 && (
+          {!loadingAwal && errorAwal && daftarFiltered.length === 0 && (
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col items-center text-center gap-2">
               <p className="text-sm text-gray-600 font-['Poppins',sans-serif]">{errorAwal}</p>
             </div>
           )}
 
-          {!loadingAwal && !errorAwal && daftarUrut.length === 0 && (
+          {!loadingAwal && !errorAwal && daftarFiltered.length === 0 && (
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col items-center text-center gap-2">
               <p className="text-sm text-gray-600 font-['Poppins',sans-serif]">
-                Belum ada data lantai untuk kejadian ini.
+                Belum ada data lantai untuk filter yang dipilih.
               </p>
             </div>
           )}
@@ -185,8 +206,10 @@ export function EvakuasiLantai() {
             </div>
           )}
 
-          {daftarUrut.map((l) => {
+          {daftarFiltered.map((l) => {
             const aksi = aksiMap[l.evakuasiId] || {};
+            const isEditing = editingMap[l.evakuasiId];
+
             return (
               <div
                 key={l.evakuasiId}
@@ -222,42 +245,65 @@ export function EvakuasiLantai() {
                   </div>
                 )}
 
-                {l.status === "Sedang Evakuasi" && (
+                {(l.status === "Sedang Evakuasi" || isEditing) && (
                   <div className="flex flex-col gap-2 pt-2 border-t border-gray-100">
                     <input
                       type="text"
-                      placeholder="Catatan (opsional)"
-                      value={catatanMap[l.evakuasiId] || ""}
+                      placeholder="Catatan / status lokasi evakuasi..."
+                      value={catatanMap[l.evakuasiId] ?? (l.catatan || "")}
                       onChange={(e) =>
                         setCatatanMap((prev) => ({ ...prev, [l.evakuasiId]: e.target.value }))
                       }
                       disabled={aksi.loading}
                       className="border border-gray-200 rounded-xl h-11 px-3 text-sm bg-white outline-none w-full shadow-sm font-['Poppins',sans-serif] disabled:opacity-60"
                     />
-                    <button
-                      type="button"
-                      disabled={aksi.loading}
-                      onClick={() => handleSelesai(l.evakuasiId)}
-                      className="w-full bg-green-600 text-white rounded-xl h-11 flex items-center justify-center gap-2 font-bold text-sm shadow-sm disabled:opacity-70 font-['Poppins',sans-serif]"
-                    >
-                      {aksi.loading ? (
-                        <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                      ) : (
-                        <CheckCircle2 className="w-4 h-4" />
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        disabled={aksi.loading}
+                        onClick={() => handleSelesai(l.evakuasiId)}
+                        className="flex-1 bg-green-600 text-white rounded-xl h-11 flex items-center justify-center gap-2 font-bold text-sm shadow-sm disabled:opacity-70 font-['Poppins',sans-serif]"
+                      >
+                        {aksi.loading ? (
+                          <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                        ) : (
+                          <CheckCircle2 className="w-4 h-4" />
+                        )}
+                        Simpan / Tandai Kosong
+                      </button>
+                      {isEditing && (
+                        <button
+                          type="button"
+                          onClick={() => setEditingMap(prev => ({ ...prev, [l.evakuasiId]: false }))}
+                          className="px-4 bg-gray-100 text-gray-600 font-bold rounded-xl text-xs"
+                        >
+                          Batal
+                        </button>
                       )}
-                      Tandai Kosong / Selesai
-                    </button>
+                    </div>
                     {aksi.error && (
                       <p className="text-xs text-red-600 font-medium font-['Poppins',sans-serif]">{aksi.error}</p>
                     )}
                   </div>
                 )}
 
-                {l.status === "Kosong" && (
-                  <div className="flex flex-col gap-1.5 pt-2 border-t border-gray-100">
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      <Clock className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                      <span>Dilaporkan kosong pukul {fmtJam(l.waktuLaporan)}</span>
+                {l.status === "Kosong" && !isEditing && (
+                  <div className="flex flex-col gap-2 pt-2 border-t border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <Clock className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                        <span>Dilaporkan kosong pukul {fmtJam(l.waktuLaporan)}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCatatanMap(prev => ({ ...prev, [l.evakuasiId]: l.catatan || "" }));
+                          setEditingMap(prev => ({ ...prev, [l.evakuasiId]: true }));
+                        }}
+                        className="text-xs text-[#0140c7] font-bold flex items-center gap-1 font-['Poppins',sans-serif] hover:underline"
+                      >
+                        <Edit2 className="w-3 h-3" /> Edit Status/Catatan
+                      </button>
                     </div>
                     {l.catatan && (
                       <p className="text-xs text-gray-500 bg-gray-50 rounded-xl p-3 leading-relaxed">{l.catatan}</p>
@@ -272,3 +318,4 @@ export function EvakuasiLantai() {
     </PetugasLayout>
   );
 }
+

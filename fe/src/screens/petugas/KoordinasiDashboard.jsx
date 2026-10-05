@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PetugasLayout } from "../../components/PetugasLayout";
+import { Link } from "react-router";
 import {
   Radio,
   ShieldCheck,
@@ -9,6 +10,7 @@ import {
   Flame,
   MessageSquare,
   Clock,
+  Activity
 } from "lucide-react";
 import { useActiveKejadian } from "@/hooks/useActiveKejadian";
 import { kejadianServices } from "@/services/kejadianServices";
@@ -55,6 +57,12 @@ export function KoordinasiDashboard() {
   const [catatanError, setCatatanError] = useState("");
 
   const mountedRef = useRef(true);
+  const isDirtyRef = useRef(false);
+
+  const handleCatatanChange = (e) => {
+    setCatatan(e.target.value);
+    isDirtyRef.current = e.target.value.length > 0;
+  };
 
   const loadStatus = useCallback(kejadianId => {
     if (!kejadianId) return Promise.resolve();
@@ -86,7 +94,9 @@ export function KoordinasiDashboard() {
 
     setLoadingStatus(true);
     loadStatus(kejadian.kejadianId);
-    const t = setInterval(() => loadStatus(kejadian.kejadianId), POLL_MS);
+    const t = setInterval(() => {
+      loadStatus(kejadian.kejadianId);
+    }, POLL_MS);
     return () => {
       mountedRef.current = false;
       clearInterval(t);
@@ -129,6 +139,7 @@ export function KoordinasiDashboard() {
     try {
       await koordinasiServices.update(kejadian.kejadianId, catatan.trim());
       setCatatan("");
+      isDirtyRef.current = false;
       setCatatanLoading(false);
       setBroadcastSent(true);
       setTimeout(() => setBroadcastSent(false), 4000);
@@ -152,7 +163,6 @@ export function KoordinasiDashboard() {
     );
   }
 
-  const header = status?.header;
   const evakuasi = status?.evakuasi || [];
   const assembly = status?.assembly || null;
   const p3k = status?.p3k || null;
@@ -168,7 +178,8 @@ export function KoordinasiDashboard() {
 
   return (
     <PetugasLayout title="Koordinasi Kejadian" subtitle="Kepala KTID">
-      { }      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex flex-col gap-2">
+      {/* Header Info Kejadian Active + Quick Access Timeline */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex flex-col gap-2">
         <div className="flex items-start justify-between gap-2">
           <div>
             <p className="font-mono text-xs font-bold text-gray-500 tracking-wider">{kejadian.kodeKejadian}</p>
@@ -177,22 +188,41 @@ export function KoordinasiDashboard() {
           <StatusPill status={kejadian.status} />
         </div>
         <p className="text-xs text-gray-500">{kejadian.lokasi}</p>
+
+        {/* Access Button to Timeline Penanganan (Issue 25) */}
+        <Link
+          to={`/darurat/status/${kejadian.kejadianId}`}
+          className="mt-1 flex items-center justify-between bg-blue-50 hover:bg-blue-100 border border-blue-200 text-[#0140c7] font-bold text-xs p-2.5 rounded-xl font-['Poppins',sans-serif] transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <Activity className="w-4 h-4 text-[#0140c7]" />
+            <span>Lihat Timeline Penanganan (Roadmap)</span>
+          </div>
+          <span className="text-[10px] bg-[#0140c7] text-white px-2 py-0.5 rounded-md font-mono">Buka →</span>
+        </Link>
+
         {statusError && <p className="text-[10px] text-red-500 font-medium">{statusError}</p>}
       </div>
 
-      { }      <section className="flex flex-col gap-3">
+      {/* Ringkasan Situasi */}
+      <section className="flex flex-col gap-3">
         <div className="flex items-center gap-2">
           <Radio className="w-4 h-4 text-[#0140c7]" />
           <h2 className="font-bold text-sm text-gray-800">Ringkasan Situasi</h2>
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">
-          { }          <div className="p-4 flex items-start gap-3">
+          <div className="p-4 flex items-start gap-3">
             <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
               <Building2 className="w-4.5 h-4.5 text-[#0140c7]" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-bold text-gray-800">Evakuasi</p>
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-bold text-gray-800">Evakuasi</p>
+                <Link to={`/darurat/status/${kejadian.kejadianId}`} className="text-[10px] text-[#0140c7] font-bold hover:underline">
+                  Lihat Timeline →
+                </Link>
+              </div>
               {loadingStatus && !status ? (
                 <p className="text-xs text-gray-400 mt-0.5">Memuat...</p>
               ) : totalLantai === 0 ? (
@@ -208,7 +238,7 @@ export function KoordinasiDashboard() {
             </div>
           </div>
 
-          { }          <div className="p-4 flex items-start gap-3">
+          <div className="p-4 flex items-start gap-3">
             <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
               <Users className="w-4.5 h-4.5 text-[#0140c7]" />
             </div>
@@ -233,7 +263,7 @@ export function KoordinasiDashboard() {
             </div>
           </div>
 
-          { }          <div className="p-4 flex items-start gap-3">
+          <div className="p-4 flex items-start gap-3">
             <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
               <HeartPulse className="w-4.5 h-4.5 text-[#0140c7]" />
             </div>
@@ -256,7 +286,7 @@ export function KoordinasiDashboard() {
             </div>
           </div>
 
-          { }          <div className="p-4 flex items-start gap-3">
+          <div className="p-4 flex items-start gap-3">
             <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
               <Flame className="w-4.5 h-4.5 text-[#0140c7]" />
             </div>
@@ -284,7 +314,8 @@ export function KoordinasiDashboard() {
         </div>
       </section>
 
-      { }      <section className="flex flex-col gap-3">
+      {/* Action Tetapkan Aman */}
+      <section className="flex flex-col gap-3">
         <div className="flex items-center gap-2">
           <ShieldCheck className="w-4 h-4 text-green-600" />
           <h2 className="font-bold text-sm text-gray-800">Tetapkan Kondisi Aman</h2>
@@ -349,7 +380,8 @@ export function KoordinasiDashboard() {
         </div>
       </section>
 
-      { }      <section className="flex flex-col gap-3">
+      {/* Form Log & Update Koordinasi */}
+      <section className="flex flex-col gap-3">
         <div className="flex items-center gap-2">
           <MessageSquare className="w-4 h-4 text-[#0140c7]" />
           <h2 className="font-bold text-sm text-gray-800">Log Koordinasi</h2>
@@ -359,7 +391,7 @@ export function KoordinasiDashboard() {
           <form onSubmit={handleSubmitCatatan} className="flex flex-col gap-2">
             <textarea
               value={catatan}
-              onChange={e => setCatatan(e.target.value)}
+              onChange={handleCatatanChange}
               placeholder="Tulis update koordinasi untuk semua pihak terkait..."
               className="border border-gray-200 rounded-xl p-3 text-sm bg-white outline-none w-full shadow-sm min-h-[80px] font-['Poppins',sans-serif]"
             />
@@ -408,3 +440,4 @@ export function KoordinasiDashboard() {
     </PetugasLayout>
   );
 }
+

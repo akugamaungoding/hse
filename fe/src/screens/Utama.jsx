@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { MobileContainer } from "../components/MobileContainer";
 import { BottomNav } from "../components/BottomNav";
 import { useApp } from "../context/AppContext";
@@ -6,6 +6,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useActiveKejadian } from "@/hooks/useActiveKejadian";
 import { KEJADIAN_STATUS_LABEL } from "@/constants/routes";
 import { asetServices } from "@/services/asetServices";
+import { kejadianServices } from "@/services/kejadianServices";
 import { useState, useEffect, useRef, useLayoutEffect, useMemo } from "react";
 import {
   Shield,
@@ -45,9 +46,12 @@ export function Utama() {
     pompas,
     apds,
   } = useApp();
+  const navigate = useNavigate();
   const { nama, roleName, roleCode } = useAuthStore();
   const { kejadian } = useActiveKejadian();
   const [recentInspeksi, setRecentInspeksi] = useState([]);
+  const [activeIncidents, setActiveIncidents] = useState([]);
+  const [showIncidentModal, setShowIncidentModal] = useState(false);
   const scrollContainerRef = useRef(null);
 
   // Civitas location state (Ruangan Kelas CB201 di Lantai 2)
@@ -55,6 +59,26 @@ export function Utama() {
 
   // Active K3 Simulation Announcement State
   const [simulasiAnnouncement, setSimulasiAnnouncement] = useState(null);
+
+  useEffect(() => {
+    kejadianServices
+      .getAll({ pageSize: 50 })
+      .then((res) => {
+        const list = (res?.data || []).filter(
+          (k) => k.status !== "Bukan Darurat" && k.status !== "Selesai"
+        );
+        setActiveIncidents(list);
+      })
+      .catch(() => {});
+  }, [kejadian]);
+
+  const handleActiveBannerClick = () => {
+    if (activeIncidents.length > 1) {
+      setShowIncidentModal(true);
+    } else if (kejadian?.kejadianId) {
+      navigate(`/darurat/status/${kejadian.kejadianId}`);
+    }
+  };
 
   useEffect(() => {
     const loadSimulasi = () => {
@@ -301,9 +325,10 @@ export function Utama() {
 
             {/* Active Emergency Alert Bar (Shown if incident active) */}
             {kejadian && (
-              <Link
-                to={`/darurat/status/${kejadian.kejadianId}`}
-                className="flex items-center justify-between bg-amber-500 text-white rounded-2xl px-5 py-3 shadow-md animate-pulse border border-amber-400"
+              <button
+                type="button"
+                onClick={handleActiveBannerClick}
+                className="w-full text-left flex items-center justify-between bg-amber-500 text-white rounded-2xl px-5 py-3 shadow-md animate-pulse border border-amber-400 cursor-pointer hover:bg-amber-600 transition-colors"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
@@ -311,7 +336,7 @@ export function Utama() {
                   </div>
                   <div>
                     <p className="font-['Poppins',sans-serif] font-bold text-xs">
-                      Tanggap Darurat Sedang Aktif
+                      Tanggap Darurat Sedang Aktif {activeIncidents.length > 1 ? `(${activeIncidents.length} Kejadian)` : ""}
                     </p>
                     <p className="text-amber-100 text-[11px]">
                       {KEJADIAN_STATUS_LABEL[kejadian.status] || kejadian.status} · {kejadian.lokasi}
@@ -319,7 +344,7 @@ export function Utama() {
                   </div>
                 </div>
                 <ChevronRight className="w-5 h-5 text-amber-100" />
-              </Link>
+              </button>
             )}
 
             {/* Active K3 Simulation Announcement Banner (Visible to ALL ROLES) */}
@@ -860,6 +885,62 @@ export function Utama() {
                   })
                 )}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal Selection Active Incidents (If >1 active incidents exist) */}
+        {showIncidentModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
+            <div className="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl flex flex-col gap-4 font-['Poppins',sans-serif]">
+              <div className="flex items-center justify-between border-b pb-3">
+                <div className="flex items-center gap-2">
+                  <Siren className="w-5 h-5 text-red-600 animate-pulse" />
+                  <h3 className="font-bold text-gray-800 text-base">Pilih Kejadian Darurat Aktif</h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowIncidentModal(false)}
+                  className="p-1 rounded-full text-gray-400 hover:bg-gray-100"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <p className="text-xs text-gray-500">
+                Terdapat <strong>{activeIncidents.length} kejadian darurat aktif</strong> saat ini. Pilih kejadian untuk melihat detail dan menangani:
+              </p>
+
+              <div className="flex flex-col gap-2.5 max-h-[300px] overflow-y-auto custom-scrollbar">
+                {activeIncidents.map((k) => (
+                  <button
+                    key={k.kejadianId}
+                    type="button"
+                    onClick={() => {
+                      setShowIncidentModal(false);
+                      navigate(`/darurat/status/${k.kejadianId}`);
+                    }}
+                    className="p-3.5 rounded-2xl border border-gray-200 hover:border-[#0140c7] bg-white hover:bg-blue-50/50 text-left flex flex-col gap-1 transition-all group cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-[#0140c7]">{k.jenisKejadian}</span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                        {KEJADIAN_STATUS_LABEL[k.status] || k.status}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-700 font-semibold">{k.lokasi}</p>
+                    <p className="text-[10px] text-gray-400 font-mono">{k.kodeKejadian}</p>
+                  </button>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowIncidentModal(false)}
+                className="w-full py-2.5 bg-gray-100 text-gray-700 font-bold text-xs rounded-xl"
+              >
+                Tutup
+              </button>
             </div>
           </div>
         )}

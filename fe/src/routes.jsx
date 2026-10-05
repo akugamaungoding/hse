@@ -52,6 +52,9 @@ const ALL_USERS = [
 // Strict Asset Managers: Only SUPER_ADMIN, SHE_AGENT, and UNIT_K3
 const ASSET_MANAGERS = ["SUPER_ADMIN", "SHE_AGENT", "UNIT_K3"];
 
+// Pompa Hydrant Managers: Only SUPER_ADMIN, UNIT_K3, and PIC_RUANG_POMPA (SHE_AGENT disabled)
+const POMPA_MANAGERS = ["SUPER_ADMIN", "UNIT_K3", "PIC_RUANG_POMPA"];
+
 function GlobalErrorBoundary() {
   return (
     <div className="min-h-screen bg-red-50 p-6 flex flex-col items-center justify-center text-center font-['Poppins',sans-serif]">
@@ -97,11 +100,11 @@ export const router = createBrowserRouter([
   { path: "/hydrant/:id/inspeksi", element: <RoleGuard allowedRoles={ASSET_MANAGERS}><AparInspeksi /></RoleGuard> },
   { path: "/hydrant/:id/riwayat", element: <RoleGuard allowedRoles={ASSET_MANAGERS}><AparRiwayat /></RoleGuard> },
 
-  { path: "/pompa-hydrant", element: <RoleGuard allowedRoles={ASSET_MANAGERS}><PompaList /></RoleGuard> },
-  { path: "/pompa-hydrant/scan", element: <RoleGuard allowedRoles={ASSET_MANAGERS}><ScanQR /></RoleGuard> },
-  { path: "/pompa-hydrant/:id", element: <RoleGuard allowedRoles={ASSET_MANAGERS}><AparDetail /></RoleGuard> },
-  { path: "/pompa-hydrant/:id/inspeksi", element: <RoleGuard allowedRoles={ASSET_MANAGERS}><AparInspeksi /></RoleGuard> },
-  { path: "/pompa-hydrant/:id/riwayat", element: <RoleGuard allowedRoles={ASSET_MANAGERS}><AparRiwayat /></RoleGuard> },
+  { path: "/pompa-hydrant", element: <RoleGuard allowedRoles={POMPA_MANAGERS}><PompaList /></RoleGuard> },
+  { path: "/pompa-hydrant/scan", element: <RoleGuard allowedRoles={POMPA_MANAGERS}><ScanQR /></RoleGuard> },
+  { path: "/pompa-hydrant/:id", element: <RoleGuard allowedRoles={POMPA_MANAGERS}><AparDetail /></RoleGuard> },
+  { path: "/pompa-hydrant/:id/inspeksi", element: <RoleGuard allowedRoles={POMPA_MANAGERS}><AparInspeksi /></RoleGuard> },
+  { path: "/pompa-hydrant/:id/riwayat", element: <RoleGuard allowedRoles={POMPA_MANAGERS}><AparRiwayat /></RoleGuard> },
 
   { path: "/emergency-box", element: <RoleGuard allowedRoles={ASSET_MANAGERS}><EmergencyBoxList /></RoleGuard> },
   { path: "/emergency-box/scan", element: <RoleGuard allowedRoles={ASSET_MANAGERS}><ScanQR /></RoleGuard> },

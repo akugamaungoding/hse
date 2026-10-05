@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams, useLocation } from "react-router";
 import { PageLayout } from "../../components/PageLayout";
+import { BottomNav } from "../../components/BottomNav";
 import { CheckCircle2, Clock, AlertTriangle, Phone, Shield, Users, XCircle } from "lucide-react";
 import { kejadianServices } from "@/services/kejadianServices";
 import { KEJADIAN_STATUS_LABEL } from "@/constants/routes";
@@ -110,11 +111,12 @@ export function StatusDarurat() {
 
   const statusIndex = STEPS.findIndex(s => s.key === status);
   const isFinal = status === "Aman" || status === "Selesai";
+  const isGempa = jenis === "Gempa Bumi";
 
-  return <PageLayout title="Status Penanganan">
+  return <PageLayout title="Status Penanganan" backTo="/utama" withBottomBar={true}>
     <div className="p-4 flex flex-col gap-4">
 
-      { }      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col items-center text-center">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col items-center text-center">
         <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 ${isFinal ? "bg-green-100" : "bg-red-100"}`}>
           {isFinal ? <CheckCircle2 className="w-8 h-8 text-green-600" /> : <AlertTriangle className="w-8 h-8 text-red-600 animate-pulse" />}
         </div>
@@ -133,7 +135,7 @@ export function StatusDarurat() {
         </div>
       </div>
 
-      { }      {(status === "Evakuasi" || status === "Assembly Point") && <Link to="/darurat/assembly" state={{ kejadianId: header.kejadianId, kodeKejadian }} className="flex items-center justify-between bg-[#0140c7] text-white rounded-2xl px-5 py-4 shadow-md shadow-blue-200 active:scale-95 transition-transform">
+      {(status === "Evakuasi" || status === "Assembly Point" || (isGempa && !isFinal)) && <Link to="/darurat/assembly" state={{ kejadianId: header.kejadianId, kodeKejadian }} className="flex items-center justify-between bg-[#0140c7] text-white rounded-2xl px-5 py-4 shadow-md shadow-blue-200 active:scale-95 transition-transform">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
             <Users className="w-5 h-5 text-white" />
@@ -145,7 +147,7 @@ export function StatusDarurat() {
         </div>
       </Link>}
 
-      { }      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
         <h3 className="font-['Poppins',sans-serif] font-bold text-gray-800 border-b pb-3 mb-4">
           Timeline Penanganan
         </h3>
@@ -154,11 +156,18 @@ export function StatusDarurat() {
           <div className="absolute left-[15px] top-2 bottom-2 w-0.5 bg-gray-100" />
 
           {STEPS.map((step, i) => {
-            const done = statusIndex > i || (statusIndex === i && status === "Selesai");
-            const active = statusIndex === i && status !== "Selesai";
+            // Step 0 ("Laporan Terkirim") is ALWAYS completed/checked
+            // For Gempa Bumi, Step 1 ("Validasi") is automatically skipped/completed
+            let done = i === 0 || (isGempa && i === 1) || statusIndex > i || (statusIndex === i && status === "Selesai");
+            let active = !done && (statusIndex === i || (isGempa && i === 2 && (status === "Menunggu Validasi" || status === "Tervalidasi" || status === "Diumumkan" || status === "Evakuasi")));
+            if (isFinal) {
+              active = false;
+              if (status === "Aman" && i <= 6) done = true;
+              if (status === "Selesai") done = true;
+            }
             const time = step.time ? fmtTime(step.time(data)) : null;
             return <div key={step.key} className={`flex gap-4 relative z-10 ${!done && !active ? "opacity-40" : ""}`}>
-              <div className={`w-8 h-8 rounded-full border-2 border-white flex items-center justify-center shrink-0 ${done ? "bg-green-100" : active ? "bg-yellow-100" : "bg-gray-100"}`}>
+              <div className={`w-8 h-8 rounded-full border-2 border-white flex items-center justify-center shrink-0 ${done ? "bg-green-100" : active ? "bg-yellow-100 ring-2 ring-yellow-400" : "bg-gray-100"}`}>
                 {done ? <CheckCircle2 className="w-4 h-4 text-green-600" /> : active ? <Clock className="w-4 h-4 text-yellow-600 animate-spin" /> : <div className="w-2 h-2 rounded-full bg-gray-400" />}
               </div>
               <div className="pt-1">
@@ -216,5 +225,6 @@ export function StatusDarurat() {
         Kembali ke Beranda
       </Link>}
     </div>
-  </PageLayout >;
+    <BottomNav />
+  </PageLayout>;
 }

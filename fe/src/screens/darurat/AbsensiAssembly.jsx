@@ -4,12 +4,14 @@ import { PageLayout } from "../../components/PageLayout";
 import { Scanner } from "@yudiel/react-qr-scanner";
 import { QrCode, CheckCircle2, AlertCircle, Keyboard, MapPin } from "lucide-react";
 import { assemblyPointServices } from "@/services/assemblyPointServices";
+import { useActiveKejadian } from "@/hooks/useActiveKejadian";
 
 export function AbsensiAssembly() {
   const navigate = useNavigate();
   const location = useLocation();
-  const kejadianId = location.state?.kejadianId;
-  const kodeKejadian = location.state?.kodeKejadian;
+  const { kejadian: activeKejadian } = useActiveKejadian();
+  const kejadianId = location.state?.kejadianId || activeKejadian?.kejadianId;
+  const kodeKejadian = location.state?.kodeKejadian || activeKejadian?.kodeKejadian;
 
   const [selectedAssemblyPoint, setSelectedAssemblyPoint] = useState("AP-01");
   const [scanned, setScanned] = useState(null);
@@ -26,19 +28,32 @@ export function AbsensiAssembly() {
     { code: "AP-03", name: "Assembly Point 3 — Area Dormitory" },
   ];
 
-  const submitAbsensi = async (kodeAssemblyPoint) => {
+  const cleanId = (raw) => {
+    if (!raw) return "";
+    let str = String(raw).trim();
+    // Trim/cleaning format "ID : 12345", "ID: 12345", or "BADGE-12345" -> "12345"
+    str = str.replace(/^(ID|BADGE)\s*[:\-\s]\s*/i, "").trim();
+    return str;
+  };
+
+  const submitAbsensi = async (rawCode) => {
+    const kodeClean = cleanId(rawCode);
+    if (!kodeClean) {
+      setError("Format ID / Kode tidak valid.");
+      return;
+    }
     if (!kejadianId) {
-      setError("Kejadian tidak ditemukan. Kembali ke halaman status dan coba lagi.");
+      setError("Kejadian tidak ditemukan. Dipastikan terdapat kejadian darurat aktif.");
       return;
     }
     setLoading(true);
     setError("");
     try {
-      await assemblyPointServices.scan(kejadianId, kodeAssemblyPoint);
+      await assemblyPointServices.scan(kejadianId, kodeClean);
       setSuccess(true);
       setTimeout(() => navigate(`/darurat/status/${kejadianId}`), 1500);
     } catch (err) {
-      setError(err.response?.data?.message || "Gagal mencatat kehadiran. Pastikan kode assembly point benar.");
+      setError(err.response?.data?.message || "Gagal mencatat kehadiran. Pastikan ID / kode assembly point benar.");
       setScanned(null);
       setLoading(false);
     }
@@ -55,7 +70,7 @@ export function AbsensiAssembly() {
   const handleManualSubmit = (e) => {
     e.preventDefault();
     if (!manualKode.trim()) return;
-    submitAbsensi(manualKode.trim().toUpperCase());
+    submitAbsensi(manualKode.trim());
   };
 
   if (success) {

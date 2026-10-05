@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PetugasLayout } from "../../components/PetugasLayout";
 import { Users, CheckCircle2, Clock, MapPin, ClipboardCheck, Plus, AlertCircle, HeartPulse } from "lucide-react";
 import { useActiveKejadian } from "@/hooks/useActiveKejadian";
 import { assemblyPointServices } from "@/services/assemblyPointServices";
+import { useAuthStore } from "@/store/useAuthStore";
 
 function fmtJam(iso) {
   if (!iso) return "-";
@@ -11,6 +12,7 @@ function fmtJam(iso) {
 
 export function AssemblyPointDashboard() {
   const { kejadian } = useActiveKejadian();
+  const { roleCode } = useAuthStore();
 
   const [selectedAp, setSelectedAp] = useState("AP-01");
   const [rekap, setRekap] = useState(null);
@@ -30,6 +32,8 @@ export function AssemblyPointDashboard() {
   const [konfirmasiLoading, setKonfirmasiLoading] = useState(false);
   const [konfirmasiError, setKonfirmasiError] = useState("");
 
+  const isTypingRef = useRef(false);
+
   const assemblyPoints = [
     { code: "AP-01", name: "Assembly Point 1 — Lapangan Utama" },
     { code: "AP-02", name: "Assembly Point 2 — Depan Parkiran" },
@@ -45,7 +49,7 @@ export function AssemblyPointDashboard() {
     }
 
     let mounted = true;
-    const load = () => {
+    const load = (initial = false) => {
       Promise.all([
         assemblyPointServices.getRekap(kejadian.kejadianId),
         assemblyPointServices.getList(kejadian.kejadianId),
@@ -65,8 +69,8 @@ export function AssemblyPointDashboard() {
     };
 
     setLoadingAwal(true);
-    load();
-    const t = setInterval(load, 5000);
+    load(true);
+    const t = setInterval(() => load(false), 5000);
     return () => {
       mounted = false;
       clearInterval(t);

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LogOut, ArrowLeft } from "lucide-react";
+import { LogOut, ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useAuthStore } from "@/store/useAuthStore";
 import { MobileContainer } from "./MobileContainer";
@@ -24,7 +24,7 @@ export function PetugasLayout({ title, subtitle, children }) {
                 className="p-1.5 bg-white/15 rounded-lg hover:bg-white/25 transition-colors text-white shrink-0 flex items-center justify-center"
                 title="Kembali ke Halaman Sebelumnya"
               >
-                <ArrowLeft className="w-4 h-4" />
+                <ChevronLeft className="w-5 h-5" />
               </button>
               <div className="min-w-0">
                 <h1 className="font-bold text-sm leading-tight truncate">{title}</h1>
